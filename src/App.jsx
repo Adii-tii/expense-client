@@ -1,13 +1,22 @@
-import './App.css'
-import './components/accordion'
+import {Route, Routes} from "react-router-dom";
+import Login from "./pages/login";
+import Home from "./pages/Home";
+import Register from "./pages/Register";
+import AppLayout from "./components/AppLayout";
+import CreateGroup from "./pages/CreateGroup";
 
-export default function App(){
+function App(){
   return(
-    <div className='container mt-5'>
-      <button className='btn btn-primary'>
-        Bootstrap working!
-      </button>
-      <Accordion></Accordion>
-    </div>
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<Home/>}/>
+        <Route path="/login" element={<Login/>}/>
+        <Route path="/register" element={<Register />} />
+        <Route path="/createGroup" element={<CreateGroup/>}/>
+      </Route>
+      
+    </Routes>
   )
 }
+
+export default App;
