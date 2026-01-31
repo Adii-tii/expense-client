@@ -1,10 +1,12 @@
 import axios from "axios";
 import { useState } from "react";
 import Button from "react-bootstrap/Button";
+import { useNavigate } from "react-router-dom";
 
-function Register() {
+function Register({refreshAuth}) {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
     password: ""
   });
@@ -25,8 +27,8 @@ function Register() {
     let newErrors = {};
     let isValid = true;
 
-    if (!formData.name.trim()) {
-      newErrors.name = "username is required";
+    if (!formData.username.trim()) {
+      newErrors.username = "username is required";
       isValid = false;
     }
 
@@ -44,7 +46,6 @@ function Register() {
     return isValid;
   };
 
-  // ---------- FORM SUBMIT ----------
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     if (!validate()) return;
@@ -53,12 +54,15 @@ function Register() {
         console.log(formData)
       const res = await axios.post(
         "http://localhost:5001/auth/register",
-        formData
+        formData, {withCredentials:true}
       );
+
       console.log(res);
 
-      setMessage(`Successfully registered as ${formData.name}`);
+      setMessage(`Successfully registered as ${formData.username}`);      
       setErrors({});
+      await refreshAuth();
+      navigate('/dashboard');
     } catch (error) {
       if (error.response) {
         setErrors({ general: error.response.data.message });
@@ -87,15 +91,15 @@ function Register() {
             <input
               type="text"
               className="form-control"
-              name="name"
-              value={formData.name}
+              name="username"
+              value={formData.username}
               onChange={handleChange}
               placeholder="Enter your username"
               required
             />
-            {errors.name && (
+            {errors.username && (
               <div className="text-danger small mt-1">
-                {errors.name}
+                {errors.username}
               </div>
             )}
           </div>
