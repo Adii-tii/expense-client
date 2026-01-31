@@ -8,7 +8,7 @@ function Footer() {
 
           {/* Brand */}
           <div className="col-md-4 mb-3">
-            <h5 className="fw-semibold">Splitwise</h5>
+            <h5 className="fw-semibold">Expense</h5>
             <p className="text-muted small mb-0">
               Track shared expenses easily.
             </p>
