@@ -2,6 +2,7 @@
   import Button from "react-bootstrap/Button";
   import axios from "axios";
   import { useNavigate } from "react-router-dom";
+  import { GoogleOAuthProvider, GoogleLogin }  from "@react-oauth/google"
 
   function Login({refreshAuth }) {  
     const navigate = useNavigate();
@@ -20,7 +21,14 @@
       });
     };
 
-    const validate = () => {
+    const hasPassword = async () => {
+
+      const res = await axios.post("http://localhost:5001/auth/valid-login", {email: formData.email});
+
+      return res.data.hasPassword; //if true user has a password
+    }
+
+    const validate = async() => {
       let newErrors = {};
       let isValid = true;
 
@@ -34,6 +42,15 @@
         isValid = false;
       }
 
+      if(isValid){
+        const userHasPassword = await hasPassword();
+
+        if(!userHasPassword){
+          newErrors.general = "Please log in using Google SSO";
+          isValid = false;
+        }
+      }
+
       setErrors(newErrors);
       return isValid;
     };
@@ -41,7 +58,11 @@
     const handleFormSubmit = async (event) => {
       event.preventDefault();
 
-      if (!validate()) return;
+      console.log("here");
+      const isValid = await validate();
+
+      if (!isValid) return;
+      console.log("passed validation")
 
       try {
           const body = {
@@ -61,10 +82,26 @@
         } else {
           setErrors({ general: "Network error. Please try again." });
         }
+      } finally{
+        console.log(isValid);
       }
     };
 
-    
+    const handleGoogleSuccess = async (authResponse) => {
+      console.log(JSON.stringify(authResponse));
+
+      const idToken = authResponse.credential;
+      const res = await axios.post("http://localhost:5001/auth/google-auth",{idToken}, {withCredentials:true});
+      console.log("Login successful:", res);
+      setMessages({login: "Successfully logged in!"});
+      await refreshAuth(); 
+      console.log("about to navigate");
+      navigate('/dashboard');
+    };
+
+    const handleGoogleFailure = (error) => {
+      console.log(error);
+    }
 
     return (
       <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
@@ -97,8 +134,17 @@
             )}
           </div>
 
-          <div className="mb-3">
-            <label className="form-label small mt-3 fw-bold">Password</label>
+          <div className="mb-3 mt-3">
+            <div className="d-flex justify-content-between align-items-center">
+              <label className="form-label small fw-bold">Password</label>
+
+              <a
+                href="/reset-password"
+                className="small text-primary text-decoration-none"
+              >
+                Forgot password?
+              </a>
+            </div>
             <input
               type="password"
               className="form-control"
@@ -128,13 +174,14 @@
 
 
         <div className="d-flex flex-column gap-2  mt-3">
-            <Button
-              type="button"
-              variant="light"
-              className="w-100 border border-secondary"
-            >
-              Continue with Google
-            </Button>
+            <div className="row justify-content-center">
+            <div>
+              <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+                <GoogleLogin onSuccess = {handleGoogleSuccess} onError= {handleGoogleFailure}/>
+              </GoogleOAuthProvider>
+              
+            </div>
+          </div>
 
             <div className="mt-3 text-center">
             Don't have an account?{" "}
