@@ -8,6 +8,7 @@ import CreateGroup from "./pages/CreateGroup";
 import Dashboard from "./pages/DashBoard";
 import axios from "axios";
 import {BeatLoader} from "react-spinners";
+import ResetPassword from "./pages/ResetPassword";
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -83,6 +84,10 @@ function App() {
             : <Register refreshAuth={refreshAuth}/>
         }
       />
+
+      <Route 
+      path="/reset-password"
+      element={<ResetPassword />}/>
 
       <Route element={<AppLayout user = {userDetails} setUserDetails={setUserDetails}/>}>
         <Route path="/" element={<Home/>} />
