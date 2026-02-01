@@ -16,7 +16,7 @@ function App() {
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true); 
 
-  const isUserLoggedIn = async() => {
+  const isUserLoggedIn = async() => { //make this getUser()
     try{
         const res = await axios.get("http://localhost:5001/auth/is-logged-in", {withCredentials: true});
         console.log(res.data)
