@@ -3,6 +3,11 @@ import { useState } from "react";
 
 function ResetPassword(){
     const [errors, setErrors] = useState();
+    const [formData, setFormData] = useState({
+        token:'',
+        email:'',
+        password:''
+    })
     const handleFormSubmit = () => {
 
     }
@@ -12,35 +17,37 @@ function ResetPassword(){
           <div className="bg-white p-4"
             style={{ width: "480px" }}>
             <form onSubmit={handleFormSubmit}>
-            <div className="text-center mb-4">
+            <div className="text-center mb-10">
                 <h3>Change your password</h3>
-                <p>Log in to expense</p>
             </div>
 
-            <div>
-                <label className="form-label small fw-bold">Token</label>
+            <div className="form-inline">
+                <div>
+                    <label className="form-label small fw-bold">Code</label>
+                    <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter the code "
+                    />
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Confirm identity</button>
+            </div>
+
+            <div className="mt-3">
+                <label className="form-label small fw-bold">Email</label>
                 <input
                 type="text"
                 className="form-control"
-                placeholder="Enter your email"
+                placeholder="Enter registered email"
                 />
             </div>
 
-            <div className="mt-4">
+            <div className="mt-3 mb-5">
                 <label className="form-label small fw-bold">New Password</label>
                 <input
                 type="text"
                 className="form-control"
-                placeholder="Enter your email"
-                />
-            </div>
-
-            <div className="mt-4 mb-5">
-                <label className="form-label small fw-bold">Confirm New Password</label>
-                <input
-                type="text"
-                className="form-control"
-                placeholder="Enter your email"
+                placeholder="Enter new password"
                 />
             </div>
 
