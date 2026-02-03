@@ -3,6 +3,8 @@
   import axios from "axios";
   import { useNavigate } from "react-router-dom";
   import { GoogleOAuthProvider, GoogleLogin }  from "@react-oauth/google"
+  import { serverEndpoint } from "../config/appConfig.js";
+   
 
   function Login({refreshAuth }) {  
     const navigate = useNavigate();
@@ -23,8 +25,7 @@
 
     const hasPassword = async () => {
 
-      const res = await axios.post("http://localhost:5001/auth/valid-login", {email: formData.email});
-
+      const res = await axios.post(`${serverEndpoint}/auth/valid-login`, {email: formData.email});
       return res.data.hasPassword; //if true user has a password
     }
 
@@ -51,8 +52,10 @@
         }
       }
 
+     if (!isValid) {
       setErrors(newErrors);
-      return isValid;
+      }
+    return isValid;
     };
 
     const handleFormSubmit = async (event) => {
@@ -70,7 +73,7 @@
             password: formData.password
           }
 
-          const res = await axios.post("http://localhost:5001/auth/login", body, {withCredentials:true});
+          const res = await axios.post(`${serverEndpoint}/auth/login`, body, {withCredentials:true});
           console.log("Login successful:", res);
           setMessages({login: "Successfully logged in!"});
           await refreshAuth();
@@ -78,7 +81,7 @@
 
       } catch (error) {
         if (error.response) {
-          setErrors({ general: error.response.data.message });
+          setErrors({ general: error.response.data.message});
         } else {
           setErrors({ general: "Network error. Please try again." });
         }
@@ -91,7 +94,7 @@
       console.log(JSON.stringify(authResponse));
 
       const idToken = authResponse.credential;
-      const res = await axios.post("http://localhost:5001/auth/google-auth",{idToken}, {withCredentials:true});
+      const res = await axios.post(`${serverEndpoint}/auth/google-auth`,{idToken}, {withCredentials:true});
       console.log("Login successful:", res);
       setMessages({login: "Successfully logged in!"});
       await refreshAuth(); 
@@ -105,7 +108,7 @@
 
     return (
       <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-          <div className="bg-white p-4"
+          <div className="bg-white p-4 shadow-sm"
           style={{ width: "480px" }}>
         <form onSubmit={handleFormSubmit}>
           <div className="text-center mb-4">
