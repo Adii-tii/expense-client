@@ -2,10 +2,16 @@ import {useState } from "react";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { BeatLoader } from "react-spinners";
+import { serverEndpoint } from "../config/appConfig";
+
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 function ResetPassword(){
+    const [codeLoading, setCodeLoading] = useState(false);
     const [errors, setErrors] = useState();
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const [message, setMessages] = useState();
     const [codeSent, setCodeSent] = useState(false);
     const [isVerified, setIsVerified] = useState(false);
@@ -23,7 +29,7 @@ function ResetPassword(){
         return;
     }
         try{
-            const res = await axios.post("http://localhost:5001/auth/generate-code", {email: formData.email});
+            const res = await axios.post(`${serverEndpoint}/auth/generate-code`, {email: formData.email});
             console.log(res);
             setCodeSent(true);
         } catch (error){
@@ -48,8 +54,9 @@ function ResetPassword(){
 
     const handleVerifyCode = async() => {
         try{
+            setCodeLoading(true);
             const {code, email} = formData;
-            const res = await axios.post("http://localhost:5001/auth/verify-code", {code, email});
+            const res = await axios.post(`${serverEndpoint}/auth/verify-code`, {code, email});
 
             if(res.data.success){
                 console.log("code has been verified");
@@ -63,21 +70,26 @@ function ResetPassword(){
             }
         } catch (error){
             console.log(error);
+        } finally{
+            setCodeLoading(false);
         }
     }
 
-    const handleFormSubmit = async () => {
+    const handleFormSubmit = async (event) => {
         event.preventDefault();
+        setLoading(true);
         const {email, newPassword} = formData;
         try{
-            const res = await axios.post("http://localhost:5001/auth/reset-password", {email, newPassword});
+            const res = await axios.post(`${serverEndpoint}/auth/reset-password`, {email, newPassword});
             console.log(res);
 
             if(res.status === 200){
                 setMessages({general: "Password reset successful. You can now log in with your new password."});
             }
 
-            navigate('/login');
+            await wait(2000);
+            navigate("/login");
+
         } catch (error) {
             console.log(error);
 
@@ -85,7 +97,9 @@ function ResetPassword(){
                 general: error.response?.data?.message 
                     || "Could not reset password. Try again later."
         });
-    }
+        }finally{
+            setLoading(false);
+        }
     }
 
     return(
@@ -129,19 +143,26 @@ function ResetPassword(){
                         />
                     </div>
                     {codeSent ? (
-                        <Button
+                    <Button
                         type="button"
                         className="btn btn-success"
                         style={{ height: "38px" }}
-                        disabled>Code Sent</Button>) :
-                        (<Button
+                        disabled
+                    >
+                        Code Sent
+                    </Button>
+                    ) : (
+                    <Button
                         type="button"
                         className="btn btn-primary"
                         style={{ height: "38px" }}
                         onClick={handleGenerateCode}
-                        >
-                        Send Code
-                        </Button>)}
+                        disabled={codeLoading}
+                    >
+                        {codeLoading ? "Sending..." : "Send Code"}
+                    </Button>
+                    )}
+
                 </div>
                 {errors?.email && (
                     <div className="text-danger small mb-3">
@@ -206,9 +227,19 @@ function ResetPassword(){
                     </div>
                 )}
 
-                <button type="submit" className="btn btn-success w-100" disable={isDisabled}>
-                    Change Password
-                </button>
+                <Button
+                    type="submit"
+                    variant="success"
+                    className="w-100"
+                    disabled={loading}
+                    >
+                    {loading ? (
+                        <BeatLoader size={10} />
+                    ) : (
+                        "Reset Password"
+                    )}
+                </Button>
+
                 </form>
             </div>
             </div>
