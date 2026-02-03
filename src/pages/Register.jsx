@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import { useNavigate } from "react-router-dom";
+import { serverEndpoint } from "../config/appConfig.js";
 
 function Register({refreshAuth}) {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ function Register({refreshAuth}) {
     try {
         console.log(formData)
       const res = await axios.post(
-        "http://localhost:5001/auth/register",
+        `${serverEndpoint}/auth/register`,
         formData, {withCredentials:true}
       );
 
@@ -74,7 +75,7 @@ function Register({refreshAuth}) {
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="bg-white p-4" style={{ width: "480px" }}>
+      <div className="bg-white p-4 shadow-sm" style={{ width: "480px" }}>
         <form onSubmit={handleFormSubmit}>
           <div className="text-center mb-4">
             <h3>Create your free account</h3>
