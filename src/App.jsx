@@ -9,25 +9,30 @@ import Dashboard from "./pages/DashBoard";
 import axios from "axios";
 import {BeatLoader} from "react-spinners";
 import ResetPassword from "./pages/ResetPassword";
+import UserLayout from "./components/userLayout";
+import { serverEndpoint } from "./config/appConfig";
+import {useSelector, useDispatch} from "react-redux"; //implement redux store to manage user state
+import { SET_USER } from "./redux/user/action.js";
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+//value of user details represents whether the user is logged in or not/ userSelector takes in 1 func as input and redux calls the fucntion that you pass to useSelector with all the values its storing or managaing. we need to take out userdetails since we are only interested in userDetails object.
 
 function App() {
-  const [userDetails, setUserDetails] = useState(null);
+  const dispatch = useDispatch();
+  const userDetails = useSelector(state => state.userDetails);
   const [loading, setLoading] = useState(true); 
 
-  const isUserLoggedIn = async() => { //make this getUser()
+  const getUser = async() => { //make this getUser()
     try{
-        const res = await axios.get("http://localhost:5001/auth/is-logged-in", {withCredentials: true});
+        const res = await axios.get( `${serverEndpoint}/auth/get-user`, {withCredentials: true});
         console.log(res.data)
-        setUserDetails(res.data.user);
-        console.log("this is the data: ", res.data);
+        dispatch({type: SET_USER, payload: res.data.user}); //update user details in redux store
+        console.log("updated formatted data: ", res.data.user);
 
         await wait(1000);
     }
     catch (error){
-        setUserDetails(null);
-        console.log(error);
+        console.log("Error fetching user data:", error);
     }
     finally {
     setLoading(false);
@@ -36,12 +41,12 @@ function App() {
 
   const refreshAuth = async () => {
     setLoading(true);
-    await isUserLoggedIn();
+    await getUser();
   };
 
 
   useEffect(() => { 
-    isUserLoggedIn();
+    getUser();
   }, [])
   
   //called when comp is rendered, if dependency array is not empty, any change in the state of the elements mentioned within the array will trigger the useEffect hook 
@@ -89,18 +94,18 @@ function App() {
       path="/reset-password"
       element={<ResetPassword />}/>
 
-      <Route element={<AppLayout user = {userDetails} setUserDetails={setUserDetails}/>}>
+      <Route element={<AppLayout/>}>
         <Route path="/" element={<Home/>} />
+      </Route>
 
-        <Route
+      <Route
           path="/dashboard"
           element={
             userDetails
-              ? <Dashboard user={userDetails} />
+              ? <UserLayout><Dashboard /></UserLayout>
               : <Navigate to="/login" />
           }
         />
-      </Route>
     </Routes>
   );
 }
