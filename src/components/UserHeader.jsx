@@ -9,7 +9,7 @@ function UserHeader({ sidebarCollapsed }) {
   const user = useSelector((state) => state.userDetails);
   const navigate = useNavigate();
 
-  const sidebarWidth = sidebarCollapsed ? 60 : 200;
+  const sidebarWidth = sidebarCollapsed ? 70 : 220;
 
   const handleLogout = async () => {
     try {
@@ -26,58 +26,136 @@ function UserHeader({ sidebarCollapsed }) {
     }
   };
 
-  return (
-    <nav
-      className="navbar bg-white border-bottom position-fixed top-0"
-      style={{
-        left: sidebarWidth,
-        width: `calc(100% - ${sidebarWidth}px)`,
-        height: "62px",
-        transition: "left 0.25s, width 0.25s",
-        zIndex: 1030,
-      }}
-    >
-      <div className="container-fluid d-flex justify-content-between align-items-center px-3">
-        <span className="fw-medium">Dashboard</span>
+return (
+  <nav
+    className="position-fixed top-0 d-flex align-items-center"
+    style={{
+      left: sidebarWidth,
+      width: `calc(100% - ${sidebarWidth}px)`,
+      height: "57px",
+      background: "#FFFFFF",
+      borderBottom: "1px solid #E6E7EC",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+      transition: "left 0.25s, width 0.25s",
+      zIndex: 1030,
+    }}
+  >
+    <div className="container-fluid d-flex justify-content-between align-items-center px-3">
 
-        <div className="dropdown">
-          <button
-            className="btn btn-light border d-flex align-items-center gap-2"
-            type="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
+      {/* Page Title */}
+      <span
+        className="fw-semibold"
+        style={{
+          color: "#2B2D42",
+          borderBottom: "2px solid #FFF6D6",
+          paddingBottom: "2px"
+        }}
+      >
+        {window.location.pathname.split("/")[1]?.charAt(0).toUpperCase() +
+          window.location.pathname.split("/")[1].slice(1) ||
+          "Dashboard"}
+      </span>
+
+      {/* User Menu */}
+      <div className="dropdown">
+
+        <button
+          className="btn d-flex align-items-center gap-2 rounded-pill px-3"
+          type="button"
+          data-bs-toggle="dropdown"
+          style={{
+            background: "#F3F4F8",
+            color: "#2B2D42",
+            border: "none",
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e)=>{
+            e.currentTarget.style.background="#F1EFFF";
+            e.currentTarget.style.color="#7C6CF2";
+          }}
+          onMouseLeave={(e)=>{
+            e.currentTarget.style.background="#F3F4F8";
+            e.currentTarget.style.color="#2B2D42";
+          }}
+        >
+
+          {/* Avatar */}
+          <div
+            className="rounded-circle d-flex align-items-center justify-content-center fw-semibold"
+            style={{
+              width: "28px",
+              height: "28px",
+              fontSize: "13px",
+              background: "#7C6CF2",
+              color: "#F1EFFF"
+              
+            }}
           >
-            <div
-              className="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center"
-              style={{ width: "28px", height: "28px", fontSize: "13px" }}
-            >
-              {user?.username?.[0]?.toUpperCase() || "U"}
-            </div>
-            <span className="fw-medium">
-              {user?.username || "User"}
-            </span>
-          </button>
+            {user?.username?.[0]?.toUpperCase() || "U"}
+          </div>
 
-          <ul className="dropdown-menu dropdown-menu-end mt-2">
-            <li>
-              <Link className="dropdown-item" to="/profile">
-                Profile
-              </Link>
-            </li>
-            <li>
-              <button
-                className="dropdown-item text-danger"
-                type="button"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
-            </li>
-          </ul>
-        </div>
+          <span className="fw-medium">
+            {user?.username || "User"}
+          </span>
+
+        </button>
+
+        {/* Dropdown */}
+        <ul
+          className="dropdown-menu dropdown-menu-end mt-2 border-0 shadow-sm"
+          style={{
+            borderRadius: "12px",
+            padding: "6px"
+          }}
+        >
+
+          <li>
+            <Link
+              className="dropdown-item rounded-3"
+              to="/profile"
+            >
+              Profile
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              className="dropdown-item rounded-3"
+              to="/manage-users"
+            >
+              Manage Users
+            </Link>
+          </li>
+
+          <li>
+            <Link 
+            className="dropdown-item rounded-3"
+            to="/manage-payments"
+            >
+              Payments
+            </Link>
+          </li>
+
+          <li><hr className="dropdown-divider" /></li>
+
+          <li>
+            <button
+              className="dropdown-item rounded-3"
+              type="button"
+              style={{ color: "#EF4444" }}
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </li>
+
+        </ul>
+
       </div>
-    </nav>
-  );
+    </div>
+  </nav>
+);
+
 }
 
 export default UserHeader;
