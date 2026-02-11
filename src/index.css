@@ -9,3 +9,58 @@
 body {
   font-family: 'Manrope', sans-serif;
 }
+
+.smooth-btn {
+  transition: all 0.3s ease;
+}
+
+.smooth-btn:hover {
+  background-color: #166E61;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.form-control:focus {
+  border-color: #7C6CF2;
+  box-shadow: 0 0 0 0.15rem rgba(124,108,242,0.25);
+}
+
+
+#custom-select {
+  width: 200px;
+  padding: 10px 15px;
+  border: 2px solid #ccc;
+  border-radius: 20px;
+  background-color: #f9f9f9;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer; /* Adds a hand cursor */
+}
+
+.expense-card {
+  border-radius: 18px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.expense-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.08) !important;
+}
+
+.sidebar-pill {
+  transition: all 0.25s ease;
+}
+
+.sidebar-pill:hover {
+  background: #F3F4F6;
+}
+
+.sidebar-pill.active {
+  background: #F1EFFF;
+}
+
+.sidebar-pill.active:hover {
+  background: #F1EFFF;
+}
+

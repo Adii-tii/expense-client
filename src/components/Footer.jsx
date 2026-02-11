@@ -1,59 +1,155 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import colors from "../theme/colors";
 
 function Footer() {
+
+  const navigate = useNavigate();
+
+  const {
+    PRIMARY,
+    PRIMARY_SOFT,
+    TEXT_MUTED,
+    RADIUS_PILL
+  } = colors;
+
   return (
-    <footer className="bg-dark text-light mt-auto">
-      <div className="container py-4">
-        <div className="row">
+    <div
+      style={{
+        background: PRIMARY,
+        color: "white"
+      }}
+      className="pt-5 pb-4"
+    >
+      <div className="container">
 
-          {/* Brand */}
-          <div className="col-md-4 mb-3">
-            <h5 className="fw-semibold">Expense</h5>
-            <p className="text-muted small mb-0">
-              Track shared expenses easily.
+        <div className="row g-4">
+
+          {/* BRAND COLUMN */}
+          <div className="col-lg-4 col-md-6">
+
+            <h5
+              style={{
+                fontWeight: 700,
+                color: "white"
+              }}
+            >
+              MergeMoney
+            </h5>
+
+            <p
+              style={{
+                color: "#E6E2FF",
+                maxWidth: "320px",
+                marginTop: "10px"
+              }}
+            >
+              A simple way to manage shared expenses, track balances,
+              and settle payments without confusion.
             </p>
+
           </div>
 
-          {/* Links */}
-          <div className="col-md-4 mb-3">
-            <h6 className="fw-semibold">Quick Links</h6>
-            <ul className="list-unstyled">
+          {/* PRODUCT LINKS */}
+          <div className="col-lg-2 col-md-6">
+
+            <h6 style={{ fontWeight: 600 }}>
+              Product
+            </h6>
+
+            <ul className="list-unstyled mt-3">
               <li>
-                <Link to="/" className="text-light text-decoration-none">
-                  Home
-                </Link>
+                <button
+                  className="btn p-0"
+                  style={{ color: "#E6E2FF" }}
+                  onClick={() => navigate("/register")}
+                >
+                  Get Started
+                </button>
               </li>
               <li>
-                <Link to="/login" className="text-light text-decoration-none">
+                <button
+                  className="btn p-0"
+                  style={{ color: "#E6E2FF" }}
+                  onClick={() => navigate("/login")}
+                >
                   Login
-                </Link>
+                </button>
+              </li>
+            </ul>
+
+          </div>
+
+          {/* COMPANY LINKS */}
+          <div className="col-lg-2 col-md-6">
+
+            <h6 style={{ fontWeight: 600 }}>
+              Company
+            </h6>
+
+            <ul className="list-unstyled mt-3">
+              <li>
+                <button className="btn p-0" style={{ color: "#E6E2FF" }}>
+                  About
+                </button>
               </li>
               <li>
-                <Link to="/register" className="text-light text-decoration-none">
-                  Register
-                </Link>
+                <button className="btn p-0" style={{ color: "#E6E2FF" }}>
+                  Contact
+                </button>
               </li>
             </ul>
+
           </div>
 
-          {/* Legal */}
-          <div className="col-md-4 mb-3">
-            <h6 className="fw-semibold">Legal</h6>
-            <ul className="list-unstyled">
-              <li className="text-muted small">Privacy Policy</li>
-              <li className="text-muted small">Terms of Service</li>
-            </ul>
+          {/* CTA MINI BLOCK */}
+          <div className="col-lg-4 col-md-6">
+
+            <h6 style={{ fontWeight: 600 }}>
+              Ready to Start?
+            </h6>
+
+            <p style={{ color: "#E6E2FF" }}>
+              Create your first group and simplify shared expenses today.
+            </p>
+
+            <button
+              className="btn px-4 py-2"
+              style={{
+                background: "white",
+                color: PRIMARY,
+                borderRadius: RADIUS_PILL,
+                fontWeight: 600
+              }}
+              onClick={() => navigate("/register")}
+            >
+              Get Started
+            </button>
+
           </div>
 
         </div>
 
-        <hr className="border-secondary" />
+        {/* BOTTOM BAR */}
+        <div
+          className="d-flex flex-column flex-md-row justify-content-between align-items-center mt-5 pt-3"
+          style={{
+            borderTop: "1px solid rgba(255,255,255,0.2)",
+            color: "#E6E2FF",
+            fontSize: "14px"
+          }}
+        >
+          <div>
+            © {new Date().getFullYear()} MergeMoney. All rights reserved.
+          </div>
 
-        <div className="text-center text-muted small">
-          © {new Date().getFullYear()} Splitwise. All rights reserved.
+          <div className="d-flex gap-3 mt-2 mt-md-0">
+            <span style={{ cursor: "pointer" }}>Privacy</span>
+            <span style={{ cursor: "pointer" }}>Terms</span>
+          </div>
         </div>
+
       </div>
-    </footer>
+    </div>
   );
 }
 
