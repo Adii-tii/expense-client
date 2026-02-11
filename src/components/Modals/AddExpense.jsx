@@ -1,135 +1,120 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { serverEndpoint } from "../../config/appConfig";
 import { useSelector } from "react-redux";
 
+const PRIMARY = "#7C6CF2";
+const BORDER = "#E5E7EB";
+const TEXT_MUTED = "#6B7280";
+
+/* ===== ROUNDING ===== */
+const round2 = (num) =>
+  Math.round((Number(num) + Number.EPSILON) * 100) / 100;
+
 function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
 
-  const user = useSelector((state) => state.userDetails);
+  const user = useSelector(state => state.userDetails);
   const groupMembers = group?.memberEmail || [];
 
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  /* ---------------- STATE ---------------- */
 
-  const [formData, setFormData] = useState({
-    title: "",
-    currency: "INR",
-    amount: "",
-    splitType: "equal"
-  });
+  const [step, setStep] = useState(1);
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState("");
+  const [currency, setCurrency] = useState("INR");
+  const [splitType, setSplitType] = useState("equal");
 
   const [participants, setParticipants] = useState([]);
   const [payments, setPayments] = useState({});
   const [splits, setSplits] = useState({});
 
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  /* ---------------- RESET ---------------- */
+
+  const reset = () => {
+    setStep(1);
+    setTitle("");
+    setAmount("");
+    setParticipants([]);
+    setPayments({});
+    setSplits({});
+    setError("");
+  };
+
+  /* ---------------- INIT ---------------- */
 
   useEffect(() => {
 
-    if (!groupMembers.length) return;
+    if (!isOpen) return;
 
     setParticipants(groupMembers);
 
     const pay = {};
     const split = {};
 
-    groupMembers.forEach(email => {
-      pay[email] = email === user.email ? 0 : 0;
-      split[email] = 0;
+    groupMembers.forEach(e => {
+      pay[e] = 0;
+      split[e] = 0;
     });
 
     setPayments(pay);
     setSplits(split);
 
-  }, [groupMembers]);
-
-  if (!isOpen) return null;
+  }, [isOpen, groupMembers]);
 
 
-  const handleChange = (name, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === "amount" ? Number(value) || "" : value
-    }));
-  };
+  /* ---------------- DERIVED ---------------- */
 
-  const toggleParticipant = (email) => {
+  const equalShare = useMemo(() => {
 
-    let updated;
+    if (!participants.length || !amount) return 0;
+    return round2(Number(amount) / participants.length);
 
-    if (participants.includes(email)) {
-      updated = participants.filter(p => p !== email);
-    } else {
-      updated = [...participants, email];
-    }
+  }, [participants, amount]);
 
-    setParticipants(updated);
+  const totalPaid = round2(
+    Object.values(payments).reduce((a, b) => a + Number(b || 0), 0)
+  );
 
-    setPayments(prev => {
-      const copy = { ...prev };
-      updated.includes(email) ? copy[email] = 0 : delete copy[email];
-      return copy;
-    });
+  const totalSplit = round2(
+    Object.values(splits).reduce((a, b) => a + Number(b || 0), 0)
+  );
 
-    setSplits(prev => {
-      const copy = { ...prev };
-      updated.includes(email) ? copy[email] = 0 : delete copy[email];
-      return copy;
-    });
-  };
-
-
-  const addPaidBy = () => {
-
-    const remaining = groupMembers.find(
-      m => !Object.keys(payments).includes(m)
-    );
-
-    if (!remaining) return;
-
-    setPayments(prev => ({
-      ...prev,
-      [remaining]: 0
-    }));
-  };
-
-  const removePaidBy = (email) => {
-    setPayments(prev => {
-      const copy = { ...prev };
-      delete copy[email];
-      return copy;
-    });
-  };
-
-
-  const totalPaid = Object.values(payments).reduce((a, b) => a + b, 0);
-
-  const equalShare =
-    participants.length && formData.amount
-      ? Number(formData.amount) / participants.length
-      : 0;
-
-  const totalSplit = Object.values(splits).reduce((a, b) => a + b, 0);
-
-  const paidMismatch =
-    formData.amount && totalPaid !== Number(formData.amount);
-
+  /* ---------------- VALIDATION ---------------- */
 
   const validate = () => {
 
-    if (!formData.title.trim()) return "Title required";
-    if (!formData.amount || formData.amount <= 0) return "Valid amount required";
-    if (!participants.length) return "Select participants";
+    if (!title.trim()) return "Expense title is required";
+    if (!amount || amount <= 0) return "Enter valid amount";
+    if (!participants.length) return "Select at least one participant";
 
-    if (paidMismatch) return "Paid total must match amount";
+    if (totalPaid !== Number(amount))
+      return "Paid amount must equal total expense";
 
-    if (formData.splitType !== "equal" && totalSplit !== Number(formData.amount)) {
-      return "Split total must match amount";
-    }
+    if (splitType === "unequal" && totalSplit !== Number(amount))
+      return "Split amount must equal total expense";
 
     return null;
   };
 
+  /* ---------------- TOGGLE PARTICIPANTS ---------------- */
+
+  const toggleParticipant = (email) => {
+
+    if (participants.includes(email)) {
+
+      setParticipants(prev => prev.filter(p => p !== email));
+
+    } else {
+
+      setParticipants(prev => [...prev, email]);
+
+    }
+  };
+
+  /* ---------------- SUBMIT ---------------- */
 
   const handleSubmit = async () => {
 
@@ -140,25 +125,23 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
 
     try {
 
-      const preparedSplits = participants.map(email => ({
-        email,
-        share: formData.splitType === "equal"
-          ? equalShare
-          : splits[email],
-        remaining: formData.splitType === "equal"
-          ? equalShare
-          : splits[email]
-      }));
-
       const payload = {
-        title: formData.title,
-        currency: formData.currency,
-        amount: Number(formData.amount),
-        splitType: formData.splitType,
-        splits: preparedSplits,
-        paidBy: Object.entries(payments).map(([email, amount]) => ({
+        title,
+        currency,
+        amount: round2(amount),
+        splitType,
+        paidBy: participants.map(email => ({
           email,
-          amount
+          amount: round2(payments[email] || 0)
+        })),
+        splits: participants.map(email => ({
+          email,
+          share: splitType === "equal"
+            ? equalShare
+            : round2(splits[email] || 0),
+          remaining: splitType === "equal"
+            ? equalShare
+            : round2(splits[email] || 0)
         }))
       };
 
@@ -168,81 +151,78 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
         { withCredentials: true }
       );
 
+      reset();
       setIsOpen(false);
-      setFormData({
-        title: "",
-        currency: "INR",
-        amount: "",
-        splitType: "equal"
-      });
-      setStep(1)
       refreshExpenses();
 
     } catch {
-      setError("Something went wrong");
+      setError("Failed to create expense");
     } finally {
       setLoading(false);
     }
   };
+  if (!isOpen) return null;
 
+  /* ---------------- UI ---------------- */
 
   return (
-    <div className="modal show d-block" style={{ background: "rgba(0,0,0,0.35)" }}>
-      <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div
-          className="modal-content rounded-4"
-          style={{
-            border: "1px solid #ECECF2",
-            boxShadow: "0 30px 60px rgba(0,0,0,0.2)"
-          }}
-        >
+    <div className="modal show d-block" style={{ background: "rgba(0,0,0,0.4)" }}>
+      <div className="modal-dialog modal-dialog-centered modal-lg">
+        <div className="modal-content rounded-4 border-0 shadow-lg">
 
           {/* HEADER */}
           <div className="modal-header border-0">
             <div>
-              <h5 className="fw-semibold mb-0">Add Expense</h5>
-              <small className="text-muted">
-                Step {step} of 3
-              </small>
+              <h5 className="fw-semibold mb-1">Add Expense</h5>
+              <small style={{ color: TEXT_MUTED }}>Step {step} of 3</small>
             </div>
-            <button className="btn-close" onClick={() => setIsOpen(false)} />
+
+            <button className="btn-close" onClick={() => { reset(); setIsOpen(false); }} />
           </div>
 
-          {/* BODY */}
           <div className="modal-body">
 
-            {error && <div className="alert alert-danger">{error}</div>}
+            {error && (
+              <div className="alert alert-danger">{error}</div>
+            )}
 
+            {/* ===== STEP 1 ===== */}
             {step === 1 && (
               <>
-                <h6 className="fw-semibold mb-3">Expense Details</h6>
+                <h6 className="mb-3 fw-semibold">Expense Details</h6>
 
                 <input
                   className="form-control mb-3"
                   placeholder="Expense title"
-                  value={formData.title}
-                  onChange={e => handleChange("title", e.target.value)}
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
                 />
 
-                <div className="d-flex gap-2 mb-3">
-                  <input
-                    type="number"
-                    className="form-control"
-                    placeholder="Amount"
-                    value={formData.amount}
-                    onChange={e => handleChange("amount", e.target.value)}
-                  />
-                  <select
-                    className="form-select"
-                    value={formData.currency}
-                    onChange={e => handleChange("currency", e.target.value)}
-                  >
-                    <option>INR</option>
-                    <option>USD</option>
-                  </select>
+                <div className="row g-2 mb-3">
+                  <div className="col-8">
+                    <input
+                      type="number"
+                      step="0.01"
+                      className="form-control"
+                      placeholder="Amount"
+                      value={amount}
+                      onChange={e => setAmount(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="col-4">
+                    <select
+                      className="form-select"
+                      value={currency}
+                      onChange={e => setCurrency(e.target.value)}
+                    >
+                      <option>INR</option>
+                      <option>USD</option>
+                    </select>
+                  </div>
                 </div>
 
-                <h6 className="fw-semibold mb-2">Participants</h6>
+                <h6 className="mb-2 fw-semibold">Participants</h6>
 
                 <div className="d-flex flex-wrap gap-2">
                   {groupMembers.map(email => (
@@ -251,11 +231,11 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                       className="btn rounded-pill px-3"
                       style={{
                         background: participants.includes(email)
-                          ? "#7C6CF2"
-                          : "#F3F4F8",
+                          ? PRIMARY
+                          : "#F3F4F6",
                         color: participants.includes(email)
                           ? "white"
-                          : "#2B2D42"
+                          : "#111827"
                       }}
                       onClick={() => toggleParticipant(email)}
                     >
@@ -266,95 +246,92 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
               </>
             )}
 
+            {/* ===== STEP 2 ===== */}
             {step === 2 && (
               <>
-                <h6 className="fw-semibold mb-3">Who Paid?</h6>
+                <h6 className="mb-3 fw-semibold">Who Paid?</h6>
 
-                {Object.keys(payments).map(email => (
-                  <div key={email} className="d-flex align-items-center gap-2 mb-2">
+                {participants.map(email => (
+                  <div key={email} className="row align-items-center mb-2">
+                    <div className="col-6">{email}</div>
 
-                    <span style={{ width: "40%" }}>{email}</span>
-
-                    <input
-                      type="number"
-                      className="form-control"
-                      value={payments[email]}
-                      onChange={e =>
-                        setPayments(p => ({
-                          ...p,
-                          [email]: Number(e.target.value)
-                        }))
-                      }
-                    />
-
-                    <button
-                      className="btn btn-sm text-danger"
-                      onClick={() => removePaidBy(email)}
-                    >
-                      ✕
-                    </button>
+                    <div className="col-6">
+                      <input
+                        type="number"
+                        step="0.01"
+                        className="form-control text-end"
+                        value={payments[email] || ""}
+                        onChange={(e) =>
+                          setPayments(prev => ({
+                            ...prev,
+                            [email]: round2(e.target.value)
+                          }))
+                        }
+                      />
+                    </div>
                   </div>
                 ))}
 
-                <button
-                  className="btn w-100 mt-2"
-                  style={{
-                    border: "2px dashed #7C6CF2",
-                    color: "#7C6CF2"
-                  }}
-                  onClick={addPaidBy}
-                >
-                  + Add another payer
-                </button>
-
-                {paidMismatch && (
-                  <div className="alert alert-danger mt-3 py-2">
-                    Paid total must equal expense amount
-                  </div>
-                )}
-
-                <small>Total paid: ₹{totalPaid}</small>
+                <small>Total Paid ₹{totalPaid.toFixed(2)}</small>
               </>
             )}
 
+            {/* ===== STEP 3 ===== */}
             {step === 3 && (
               <>
-                <h6 className="fw-semibold mb-3">Split Type</h6>
+                <h6 className="mb-3 fw-semibold">Split Method</h6>
 
-                {["equal", "unequal", "share"].map(type => (
-                  <button
-                    key={type}
-                    className="btn rounded-pill me-2"
-                    style={{
-                      background:
-                        formData.splitType === type
-                          ? "#7C6CF2"
-                          : "#F3F4F8",
-                      color:
-                        formData.splitType === type
-                          ? "white"
-                          : "#2B2D42"
-                    }}
-                    onClick={() => handleChange("splitType", type)}
-                  >
-                    {type}
-                  </button>
-                ))}
+                <div className="mb-3">
+                  {["equal", "unequal"].map(type => (
+                    <button
+                      key={type}
+                      className="btn me-2 rounded-pill"
+                      style={{
+                        background: splitType === type ? PRIMARY : "#F3F4F6",
+                        color: splitType === type ? "white" : "#111827"
+                      }}
+                      onClick={() => setSplitType(type)}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
 
-                <button
-                  className="btn border rounded-pill ms-2"
-                  onClick={() => handleChange("splitType", "custom")}
-                >
-                  Custom
-                </button>
-
-                {formData.splitType === "equal" && (
-                  <div className="mt-3">
-                    Each owes ₹{equalShare.toFixed(2)}
+                {splitType === "equal" && (
+                  <div>
+                    Each pays ₹{equalShare.toFixed(2)}
                   </div>
+                )}
+
+                {splitType === "unequal" && (
+                  <>
+                    {participants.map(email => (
+                      <div key={email} className="row mb-2">
+                        <div className="col-6">{email}</div>
+
+                        <div className="col-6">
+                          <input
+                            type="number"
+                            step="0.01"
+                            className="form-control text-end"
+                            value={splits[email] || ""}
+                            onChange={(e) =>
+                              setSplits(prev => ({
+                                ...prev,
+                                [email]: round2(e.target.value)
+                              }))
+                            }
+                          />
+                        </div>
+                      </div>
+                    ))}
+
+                    <small>Total Split ₹{totalSplit.toFixed(2)}</small>
+                  </>
                 )}
               </>
             )}
+
           </div>
 
           {/* FOOTER */}
@@ -362,9 +339,8 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
 
             <button
               className="btn"
-              disabled={loading}
               onClick={() =>
-                step === 1 ? setIsOpen(false) : setStep(step - 1)
+                step === 1 ? (reset(), setIsOpen(false)) : setStep(step - 1)
               }
             >
               {step === 1 ? "Cancel" : "Back"}
@@ -372,11 +348,9 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
 
             <button
               className="btn text-white"
-              style={{ background: "#7C6CF2" }}
-              disabled={loading || (step === 2 && paidMismatch)}
-              onClick={() =>
-                step < 3 ? setStep(step + 1) : handleSubmit()
-              }
+              style={{ background: PRIMARY }}
+              disabled={loading}
+              onClick={() => step < 3 ? setStep(step + 1) : handleSubmit()}
             >
               {loading ? "Saving..." : step === 3 ? "Add Expense" : "Next"}
             </button>
