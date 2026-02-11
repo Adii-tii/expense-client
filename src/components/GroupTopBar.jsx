@@ -1,11 +1,9 @@
-import { useState } from "react";
-
-function GroupTopBar({ group, onEdit, onDelete, handleAddExpense, toggleMembers }) {
+function GroupTopBar({ onEdit, onDelete, handleAddExpense, toggleMembers }) {
 
   return (
     <>
       <div
-        className="d-flex justify-content-between align-items-center px-4 mt-5"
+        className="d-flex justify-content-between align-items-center px-4"
         style={{
           height: "60px",
           background: "#FFFFFF",
@@ -13,10 +11,8 @@ function GroupTopBar({ group, onEdit, onDelete, handleAddExpense, toggleMembers 
         }}
       >
 
-        {/* LEFT */}
         <div className="d-flex align-items-center gap-3">
 
-          {/* Search */}
           <div className="position-relative">
             <i
               className="bi bi-search position-absolute"
@@ -41,7 +37,6 @@ function GroupTopBar({ group, onEdit, onDelete, handleAddExpense, toggleMembers 
             />
           </div>
 
-          {/* Add Expense */}
           <button
             className="btn rounded-circle d-flex align-items-center justify-content-center"
             style={{
@@ -59,10 +54,8 @@ function GroupTopBar({ group, onEdit, onDelete, handleAddExpense, toggleMembers 
         </div>
 
 
-        {/* RIGHT */}
         <div className="d-flex align-items-center gap-3">
 
-          {/* Members Button */}
           <button
             className="btn border-0"
             onClick={toggleMembers}
@@ -74,7 +67,6 @@ function GroupTopBar({ group, onEdit, onDelete, handleAddExpense, toggleMembers 
             <i className="bi bi-people"></i>
           </button>
 
-          {/* Menu */}
           <div className="dropdown">
 
             <button

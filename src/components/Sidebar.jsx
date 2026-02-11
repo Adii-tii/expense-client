@@ -13,7 +13,7 @@ function Sidebar({ collapsed, setCollapsed }) {
     ["expenses", "bi-receipt", "Expenses"],
     ["groups", "bi-people", "Groups"],
     ["balances", "bi-wallet2", "Balances"],
-    ["activity", "bi-clock-history", "Activity"]
+    ["transactions", "bi-cash", "Transactions"]
   ];
 
   const active = location.pathname.split("/")[1] || "dashboard";
@@ -32,7 +32,7 @@ function Sidebar({ collapsed, setCollapsed }) {
     >
 
       {/* ===== HEADER ===== */}
-      <div className="px-3 py-2  border-bottom d-flex align-items-center justify-content-between" style={{height: "57px" }}>
+      <div className="px-3 py-2  border-bottom d-flex align-items-center justify-content-between" style={{height: "55px" }}>
         {!collapsed && (
           <span className="fw-semibold" style={{ color: "#2B2D42"}}>
             Expense
@@ -44,7 +44,6 @@ function Sidebar({ collapsed, setCollapsed }) {
           className="d-flex align-items-center justify-content-center"
           style={{
             width: "34px",
-            height: "34px",
             borderRadius: "50%",
             cursor: "pointer",
             color: "#5F6368"
