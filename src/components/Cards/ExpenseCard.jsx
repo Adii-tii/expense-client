@@ -3,98 +3,137 @@ import { useSelector } from "react-redux";
 function ExpenseCard({ expense, onClick }) {
 
   const user = useSelector((state) => state.userDetails);
+  if (!user) return null;
+
+  /* ===== THEME ===== */
 
   const PRIMARY = "#7C6CF2";
   const PRIMARY_SOFT = "#F1EFFF";
-  const TEXT_MAIN = "#2B2D42";
+  const TEXT_MAIN = "#111827";
   const TEXT_MUTED = "#6B7280";
-  const BORDER = "#E6E7EC";
+  const BORDER = "#E5E7EB";
   const BG_WHITE = "#FFFFFF";
-  const YELLOW_ACCENT = "#F4C430";
 
-  const splits = expense.splits || [];
-  const paidBy = expense.paidBy || [];
+  const GREEN = "#16A34A";
+  const RED = "#DC2626";
 
-  const currentShare =
-    splits.find(s => s.email === user.email)?.share || 0;
+  /* ===== DATA ===== */
+
+  const splits = expense?.splits || [];
+  const paidBy = expense?.paidBy || [];
+
+  const mySplit = splits.find(s => s.email === user.email);
+
+  const myShare = Number(mySplit?.share || 0);
+  const myRemaining = Number(mySplit?.remaining ?? myShare);
 
   const currentPaid =
-    paidBy.find(p => p.email === user.email)?.amount || 0;
+    Number(paidBy.find(p => p.email === user.email)?.amount || 0);
 
-  const balance = currentPaid - currentShare;
+  const balance = currentPaid - myShare;
 
-  const getStatusLabel = () => {
-    if (expense.isSettled) return "Settled";
-    if (balance > 0) return `You receive ₹${balance}`;
-    if (balance < 0) return `You owe ₹${Math.abs(balance)}`;
-    return "No dues";
-  };
+  /* ===== STATUS ===== */
 
-  const participants = [...splits, ...paidBy]
-    .filter(p => p?.email)
-    .reduce((acc, curr) => {
-      if (!acc.find(a => a.email === curr.email)) acc.push(curr);
-      return acc;
-    }, []);
+  let type = "settled";
+  let displayAmount = 0;
+  let color = TEXT_MUTED;
+
+  if (balance > 0) {
+    type = "lent";
+    displayAmount = balance;
+    color = GREEN;
+  } else if (myRemaining > 0) {
+    type = "borrowed";
+    displayAmount = myRemaining;
+    color = RED;
+  }
+
+  /* ===== PARTICIPANTS ===== */
+
+  const participants = [...new Map(
+    [...splits, ...paidBy].map(p => [p.email, p])
+  ).values()];
 
   const getInitial = (email) =>
     email?.[0]?.toUpperCase() || "?";
+
+  /* ===== DATE ===== */
 
   const dateObj = new Date(expense.createdAt);
 
   const day = dateObj.toLocaleDateString("en-IN", { day: "2-digit" });
   const month = dateObj.toLocaleDateString("en-IN", { month: "short" }).toUpperCase();
-  const time = dateObj.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+  const time = dateObj.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  /* ===== UI ===== */
 
   return (
-    <div className="d-flex">
+    <div className="d-flex gap-3">
 
-      {/* DATE PANEL */}
+      {/* DATE COLUMN */}
       <div
         style={{
-          width: "80px",
+          width: "70px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
-          fontWeight: 700,
-          color: PRIMARY
+          justifyContent: "center"
         }}
       >
-        <div style={{ fontSize: "26px", lineHeight: "24px" }}>
+        <div
+          style={{
+            fontSize: "50px",
+            fontWeight: 900,
+            color: PRIMARY,
+            lineHeight: "45px"
+          }}
+        >
           {day}
-        </div>
-        <div style={{ fontSize: "13px", letterSpacing: "1px" }}>
+        </div>  
+
+        <div
+          style={{
+            fontSize: "16px",
+            color: TEXT_MUTED,
+            letterSpacing: "1.2px",
+            fontWeight: 700
+          }}
+        >
           {month}
         </div>
       </div>
 
       {/* CARD */}
       <div
-        onClick={() => onClick(expense)}
+        onClick={() => onClick?.(expense)}
         style={{
           flex: 1,
           display: "flex",
           background: BG_WHITE,
-          borderRadius: "18px",
+          borderRadius: "14px",
           border: `1px solid ${BORDER}`,
-          cursor: "pointer",
           overflow: "hidden",
-          transition: "0.2s"
+          cursor: "pointer"
         }}
       >
 
         {/* ICON PANEL */}
         <div
           style={{
-            width: "70px",
+            width: "90px",
             background: PRIMARY_SOFT,
             display: "flex",
             alignItems: "center",
             justifyContent: "center"
           }}
         >
-          <i className="bi bi-receipt" style={{ fontSize: "26px", color: PRIMARY }} />
+          <i
+            className="bi bi-receipt"
+            style={{ fontSize: "50px", color: PRIMARY }}
+          />
         </div>
 
         {/* CONTENT */}
@@ -102,51 +141,105 @@ function ExpenseCard({ expense, onClick }) {
 
           <div className="d-flex justify-content-between align-items-start">
 
-            <div>
-              <div style={{ fontWeight: 600, fontSize: "15px", color: TEXT_MAIN }}>
+            {/* LEFT SIDE */}
+            <div style={{ flex: 1 }}>
+
+              <div
+                style={{
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  color: TEXT_MAIN
+                }}
+              >
                 {expense.title}
               </div>
 
-              <div style={{ fontSize: "12px", color: TEXT_MUTED }}>
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: TEXT_MUTED,
+                  marginTop: "2px"
+                }}
+              >
                 {time}
               </div>
+
+              {expense.notes && (
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: TEXT_MUTED,
+                    marginTop: "5px"
+                  }}
+                >
+                  {expense.notes}
+                </div>
+              )}
+
             </div>
 
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: "18px", fontWeight: 700 }}>
-                ₹{expense.amount}
-              </div>
+            {/* RIGHT FINANCIAL BLOCK */}
+            <div style={{ textAlign: "right", minWidth: "95px" }}>
 
-              <div style={{ fontSize: "11px", fontWeight: 600, color: PRIMARY }}>
-                {getStatusLabel()}
-              </div>
+              {type !== "settled" ? (
+                <>
+                  <div
+                    style={{
+                      fontSize: "10px",
+                      fontWeight: 700,
+                      letterSpacing: "1px",
+                      textTransform: "uppercase",
+                      color: color
+                    }}
+                  >
+                    {type}
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: 900,
+                      color: color
+                    }}
+                  >
+                    ₹{displayAmount.toFixed(2)}
+                  </div>
+                </>
+              ) : (
+                <div
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: TEXT_MUTED
+                  }}
+                >
+                  Settled
+                </div>
+              )}
+
             </div>
 
           </div>
 
-          {expense.notes && (
-            <div style={{ fontSize: "12px", color: TEXT_MUTED, marginTop: "6px" }}>
-              {expense.notes}
-            </div>
-          )}
+          {/* FOOTER */}
+          <div className="d-flex justify-content-between align-items-center mt-2">
 
-          <div className="d-flex justify-content-between align-items-center" style={{ marginTop: "10px" }}>
-
-            <div className="d-flex align-items-center">
+            {/* PARTICIPANTS */}
+            <div className="d-flex">
               {participants.slice(0, 4).map((p, i) => (
                 <div
                   key={p.email}
                   title={p.email}
                   style={{
-                    width: "30px",
-                    height: "30px",
+                    width: "26px",
+                    height: "26px",
                     borderRadius: "50%",
                     background: PRIMARY_SOFT,
                     color: PRIMARY,
-                    fontSize: "11px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    fontSize: "10px",
                     marginLeft: i ? "-6px" : 0,
                     border: "2px solid white"
                   }}
@@ -156,13 +249,14 @@ function ExpenseCard({ expense, onClick }) {
               ))}
             </div>
 
+            {/* SPLIT TYPE BADGE */}
             <span
               style={{
-                fontSize: "11px",
-                background: "#FFF7D6",
-                color: YELLOW_ACCENT,
+                fontSize: "10px",
                 padding: "3px 9px",
                 borderRadius: "999px",
+                background: PRIMARY_SOFT,
+                color: PRIMARY,
                 fontWeight: 600
               }}
             >
