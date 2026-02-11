@@ -7,7 +7,7 @@ function UserLayout({ children }) {
 
   
   const sidebarWidth = sidebarCollapsed ? 45 : 195;
-  const headerHeight = 56; // Height of the header in pixels
+  const headerHeight = 33; // Height of the header in pixels
 
   return (
     <div className="bg-light">
@@ -22,10 +22,10 @@ function UserLayout({ children }) {
       <main
         style={{
           marginLeft: sidebarWidth,
-          paddingTop: headerHeight,
+          marginTop: headerHeight,
           transition: "margin-left 0.25s",
         }}
-        className="bg-white min-vh-100 p-4"
+        className="bg-light min-vh-100 p-4"
       >
         {children}
       </main>

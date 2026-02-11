@@ -41,7 +41,7 @@ function HeroSection() {
             </div>
 
 
-            <div className="container py-5 position-relative">
+            <div className="container py-5 mt-4 position-relative">
 
                 <div className="row justify-content-center text-center">
 
