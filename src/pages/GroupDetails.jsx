@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import GroupTopBar from "../components/GroupTopBar";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import AddExpense from "../components/Modals/AddExpense";
 import { serverEndpoint } from "../config/appConfig";
 import axios from "axios";
@@ -26,86 +26,74 @@ function GroupDetails() {
 
     const [expenses, setExpenses] = useState([]);
     const [settlements, setSettlements] = useState([]);
+
     const [userOwes, setUserOwes] = useState(0);
     const [userIsOwed, setUserIsOwed] = useState(0);
     const [overallBalance, setOverallBalance] = useState(0);
 
+    const [balances, setBalances] = useState([]);
+
     const handleAddExpense = () => setIsOpen(true);
 
-    // ================= FETCH EXPENSES =================
+
     const fetchExpenses = async () => {
 
         if (!group?._id) return;
 
-        const res = await axios.get(
-            `${serverEndpoint}/groups/${group._id}/expenses`,
-            { withCredentials: true }
-        );
+        try {
 
-        const { expenses, totalOwed, totalUserIsOwed } = res.data;
+            const [
+                expRes,
+                owedRes,
+                isOwedRes,
+                peopleIOweRes
+            ] = await Promise.all([
+                axios.get(`${serverEndpoint}/groups/${group._id}/expenses`, { withCredentials: true }),
+                axios.get(`${serverEndpoint}/groups/${group._id}/total-owed`, { withCredentials: true }),
+                axios.get(`${serverEndpoint}/groups/${group._id}/total-is-owed`, { withCredentials: true }),
+                axios.get(`${serverEndpoint}/groups/${group._id}/people-i-owe`, { withCredentials: true })
+            ]);
 
-        setExpenses(expenses || []);
-        setUserOwes(totalOwed || 0);
-        setUserIsOwed(totalUserIsOwed || 0);
-        setOverallBalance((totalUserIsOwed || 0) - (totalOwed || 0));
+            setExpenses(expRes.data.expenses || []);
+
+            const totalOwed = owedRes.data.totalOwed || 0;
+            const totalIsOwed = isOwedRes.data.totalIsOwed || 0;
+
+            setUserOwes(totalOwed);
+            setUserIsOwed(totalIsOwed);
+            setOverallBalance(totalIsOwed - totalOwed);
+
+            setBalances(peopleIOweRes.data.creditors || []);
+
+        } catch (err) {
+            console.error("Expense fetch failed", err);
+        }
     };
+
 
     const fetchSettlements = async () => {
 
         if (!group?._id) return;
 
-        const res = await axios.get(
-            `${serverEndpoint}/groups/${group._id}/settlements`,
-            { withCredentials: true }
-        );
+        try {
 
-        setSettlements(res.data.settlements || []);
+            const res = await axios.get(
+                `${serverEndpoint}/groups/${group._id}/settlements`,
+                { withCredentials: true }
+            );
+
+            setSettlements(res.data.settlements || []);
+
+        } catch (err) {
+            console.error("Settlement fetch failed", err);
+        }
     };
 
     useEffect(() => {
         fetchExpenses();
         fetchSettlements();
-    }, [group]);
+    }, [group?._id]);
 
-    const balances = useMemo(() => {
-
-        const map = {};
-
-        expenses.forEach(exp => {
-
-            if (exp.isSettled) return;
-
-            const mySplit = exp.splits?.find(s => s.email === user.email);
-
-            if (mySplit?.remaining > 0) {
-
-                exp.paidBy?.forEach(payer => {
-
-                    if (payer.email === user.email) return;
-
-                    map[payer.email] =
-                        (map[payer.email] || 0) + mySplit.remaining;
-                });
-            }
-
-            exp.splits?.forEach(split => {
-
-                if (split.email === user.email) return;
-
-                const paidByUser = exp.paidBy?.find(p => p.email === user.email);
-
-                if (paidByUser && split.remaining > 0) {
-
-                    map[split.email] =
-                        (map[split.email] || 0) - split.remaining;
-                }
-            });
-
-        });
-
-        return map;
-
-    }, [expenses, user.email]);
 
     const timelineItems = [
         ...expenses.map(e => ({ type: "expense", createdAt: e.createdAt, data: e })),
@@ -165,7 +153,7 @@ function GroupDetails() {
                             userIsOwed={userIsOwed}
                             onSettle={() => setSettleOpen(true)}
                         />
-                    )}
+                    )}  
 
                     {timelineItems.length === 0 && (
                         <div
@@ -190,7 +178,7 @@ function GroupDetails() {
                     )}
 
                     {timelineItems.length > 0 && (
-                        <div style={{ position: "relative", padding: "20px 20px 0 52px" }}>
+                        <div className="px-5" style={{ position: "relative"}}>
 
                             {Object.entries(groupedTimeline).map(([date, items]) => (
                                 <div key={date}>
@@ -266,9 +254,13 @@ function GroupDetails() {
 
             <SettleUpModal
                 isOpen={settleOpen}
-                setIsOpen={setSettleOpen}
+                setIsOpen={(val) => {
+                    setSettleOpen(val);
+                    if (!val) setSelectedExpense(null);
+                }}
                 group={group}
                 balances={balances}
+                expense={selectedExpense}  
                 refreshExpenses={() => {
                     fetchExpenses();
                     fetchSettlements();
@@ -279,6 +271,10 @@ function GroupDetails() {
                 expense={selectedExpense}
                 isOpen={!!selectedExpense}
                 onClose={() => setSelectedExpense(null)}
+                onSettleExpense={(expense) => {
+                    setSelectedExpense(expense);
+                    setSettleOpen(true);
+                }}
             />
 
         </div>
