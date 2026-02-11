@@ -25,8 +25,8 @@ function SummaryCards() {
   return (
     <div className="row g-3">
       {cards.map((card, index) => (
-        <div className="col-xl-3 col-lg-6 col-md-6 col-sm-12" key={index}>
-          <div className="card border h-100">
+        <div className="col-xl-3 col-lg-6 col-md-6 col-sm-12 " key={index}>
+          <div className="card border h-100 p-2 rounded-4 border-0">
             <div className="card-body d-flex justify-content-between align-items-center">
               <div>
                 <div className="text-muted small mb-1">
