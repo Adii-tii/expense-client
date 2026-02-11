@@ -1,89 +1,167 @@
-import { useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function Sidebar({ collapsed, setCollapsed }) {
-  const [active, setActive] = useState("dashboard");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const user = useSelector((state) => state.userDetails);
 
-  const width = collapsed ? "60px" : "200px";
+  const width = collapsed ? "70px" : "220px";
 
-  const navItem = (key) =>
-    `
-    w-100 d-flex align-items-center
-    ${collapsed ? "justify-content-center" : ""}
-    px-3 py-2 text-dark border-0 bg-transparent
-    ${active === key ? "bg-light border-start border-3 border-dark fw-medium" : ""}
-    `;
+  const menuItems = [
+    ["dashboard", "bi-grid", "Dashboard"],
+    ["expenses", "bi-receipt", "Expenses"],
+    ["groups", "bi-people", "Groups"],
+    ["balances", "bi-wallet2", "Balances"],
+    ["activity", "bi-clock-history", "Activity"]
+  ];
+
+  const active = location.pathname.split("/")[1] || "dashboard";
 
   return (
     <div
-      className="bg-white border-end position-fixed top-0 start-0 d-flex flex-column"
-      style={{ width, height: "100vh", transition: "width 0.25s" }}
+      className="position-fixed top-0 start-0 d-flex flex-column"
+      style={{
+        width,
+        height: "100vh",
+        background: "#FFFFFF",
+        borderRight: "1px solid #E6E7EC",
+        transition: "width 0.25s",
+        zIndex: 1000
+      }}
     >
-      {/* Header */}
-      <div className="d-flex align-items-center justify-content-between px-3 py-3 border-bottom">
-        {!collapsed && <span className="fw-semibold">Expense</span>}
-        <button
-          className="btn btn-sm btn-outline-dark p-1"
+
+      {/* ===== HEADER ===== */}
+      <div className="px-3 py-2  border-bottom d-flex align-items-center justify-content-between" style={{height: "57px" }}>
+        {!collapsed && (
+          <span className="fw-semibold" style={{ color: "#2B2D42"}}>
+            Expense
+          </span>
+        )}
+
+        <div
           onClick={() => setCollapsed(!collapsed)}
+          className="d-flex align-items-center justify-content-center"
+          style={{
+            width: "34px",
+            height: "34px",
+            borderRadius: "50%",
+            cursor: "pointer",
+            color: "#5F6368"
+          }}
         >
-          <i className="bi bi-list"></i>
-        </button>
+          <i className={`bi ${collapsed ? "bi-list" : "bi-layout-sidebar"}`} />
+        </div>
       </div>
 
-      {/* Menu */}
-      <ul className="nav flex-column mt-2 flex-grow-1">
-        {[
-          ["dashboard", "bi-grid", "Dashboard"],
-          ["expenses", "bi-receipt", "Expenses"],
-          ["groups", "bi-people", "Groups"],
-          ["balances", "bi-wallet2", "Balances"],
-          ["activity", "bi-clock-history", "Activity"],
-        ].map(([key, icon, label]) => (
-          <li className="nav-item" key={key}>
-            <button
-              className={navItem(key)}
-              onClick={() => setActive(key)}
-            >
-              <i className={`bi ${icon} ${collapsed ? "" : "me-3"}`}></i>
-              {!collapsed && <span>{label}</span>}
-            </button>
-          </li>
-        ))}
+      {/* ===== MENU ===== */}
+      <ul className="nav flex-column mt-3 flex-grow-1 px-2">
+        {menuItems.map(([key, icon, label]) => {
+          const isActive = active === key;
+
+          return (
+            <li key={key} className="nav-item mb-1">
+              <button
+                className="w-100 d-flex align-items-center border-0 bg-transparent position-relative"
+                style={{
+                  padding: "8px",
+                  borderRadius: collapsed ? "999px" : "12px",
+                  background: isActive ? "#F1EFFF" : "transparent",
+                  transition: "all 0.2s ease"
+                }}
+                onClick={() => navigate(`/${key}`)}
+              >
+
+                {!collapsed && isActive && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: "-6px",
+                      height: "60%",
+                      width: "4px",
+                      borderRadius: "4px",
+                      background: "#7C6CF2"
+                    }}
+                  />
+                )}
+
+                <div
+                  className="d-flex align-items-center justify-content-center"
+                  style={{
+                    width: "38px",
+                    height: "38px",
+                    borderRadius: "999px",
+                    background: collapsed && isActive ? "#F1EFFF" : "transparent",
+                    color: isActive ? "#7C6CF2" : "#353839"
+                  }}
+                >
+                  <i className={`bi ${icon}`} />
+                </div>
+
+                {!collapsed && (
+                  <span
+                    className="ms-2 fw-medium"
+                    style={{ color: isActive ? "#7C6CF2" : "#2B2D42" }}
+                  >
+                    {label}
+                  </span>
+                )}
+              </button>
+            </li>
+          );
+        })}
 
         <hr className="my-3" />
 
+        {/* ===== SETTINGS ===== */}
         <li className="nav-item">
           <button
-            className={navItem("settings")}
-            onClick={() => setActive("settings")}
+            className="w-100 d-flex align-items-center border-0 bg-transparent"
+            style={{
+              padding: "8px",
+              borderRadius: collapsed ? "999px" : "12px",
+              background: active === "settings" ? "#F1EFFF" : "transparent"
+            }}
+            onClick={() => navigate("/settings")}
           >
-            <i className={`bi bi-gear ${collapsed ? "" : "me-3"}`}></i>
-            {!collapsed && <span>Settings</span>}
+            <div
+              className="d-flex align-items-center justify-content-center"
+              style={{
+                width: "38px",
+                height: "38px",
+                borderRadius: "999px",
+                background:
+                  collapsed && active === "settings" ? "#F1EFFF" : "transparent",
+                color: active === "settings" ? "#7C6CF2" : "#353839"
+              }}
+            >
+              <i className="bi bi-gear" />
+            </div>
+
+            {!collapsed && (
+              <span className="ms-2 fw-medium">Settings</span>
+            )}
           </button>
         </li>
       </ul>
 
-      {/* Account Section */}
-      <div className="border-top">
-        <button
-          className={`
-            w-100 d-flex align-items-center
-            ${collapsed ? "justify-content-center" : "justify-content-between"}
-            px-3 py-3 border-0 bg-transparent
-            ${active === "account" ? "bg-light border-start border-3 border-dark" : ""}
-          `}
-          onClick={() => setActive("account")}
+      {/* ===== ACCOUNT ===== */}
+      <div className="border-top px-3 py-3 d-flex align-items-center">
+        <div
+          className="rounded-circle d-flex align-items-center justify-content-center fw-semibold"
+          style={{
+            width: "38px",
+            height: "38px",
+            background: "#F1EFFF",
+            color: "#7C6CF2"
+          }}
         >
-          <div className="d-flex align-items-center">
-            <div
-              className="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center"
-              style={{ width: "32px", height: "32px", fontSize: "13px" }}
-            >
-              U
-            </div>
-            {!collapsed && <span className="ms-3 fw-medium">User Name</span>}
-          </div>
-          {!collapsed && <i className="bi bi-chevron-down"></i>}
-        </button>
+          {user.username?.[0]?.toUpperCase() || "U"}
+        </div>
+
+        {!collapsed && (
+          <span className="ms-2 fw-medium">{user.username}</span>
+        )}
       </div>
     </div>
   );

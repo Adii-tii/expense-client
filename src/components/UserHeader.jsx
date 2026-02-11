@@ -4,6 +4,7 @@ import { serverEndpoint } from "../config/appConfig";
 import { useSelector, useDispatch } from "react-redux";
 import { CLEAR_USER } from "../redux/user/action.js";
 
+
 function UserHeader({ sidebarCollapsed }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userDetails);
@@ -133,6 +134,15 @@ return (
             to="/manage-payments"
             >
               Payments
+            </Link>
+          </li>
+
+          <li>
+            <Link 
+            className="dropdown-item rounded-3"
+            to="/manage-subscriptions"
+            >
+              Subscriptions
             </Link>
           </li>
 
