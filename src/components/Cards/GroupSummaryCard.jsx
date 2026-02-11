@@ -1,10 +1,12 @@
 import React from "react";
 
-function GroupSummaryCards({ myBalance, userOwes, userIsOwed, onSettle }) {
+function GroupSummaryCards({ myBalance = 0, userOwes = 0, userIsOwed = 0, onSettle }) {
 
   const PRIMARY = "#7C6CF2";
   const TEXT_MAIN = "#2B2D42";
   const TEXT_MUTED = "#9CA3AF";
+
+  const formatMoney = (value) => `₹${Number(value).toFixed(2)}`;
 
   const cards = [
     {
@@ -12,40 +14,49 @@ function GroupSummaryCards({ myBalance, userOwes, userIsOwed, onSettle }) {
       value:
         myBalance === 0
           ? "Settled"
-          : `₹${Math.abs(myBalance)}`,
+          : formatMoney(Math.abs(myBalance)),
+
       subtitle:
         myBalance > 0
           ? "You will receive money"
           : myBalance < 0
           ? "You need to pay money"
           : "All expenses cleared",
+
       icon: "bi-wallet2",
       showButton: false
     },
+
     {
       title: "You owe",
-      value: `₹${userOwes || 0}`,
+      value: formatMoney(Math.max(userOwes, 0)),
+
       subtitle:
         userOwes > 0
           ? "Pending payments"
           : "Nothing to pay",
+
       icon: "bi-arrow-down-left-circle",
-      showButton: userOwes > 0
+
+      showButton: userOwes > 0.01   // prevents float glitches
     },
+
     {
       title: "You are owed",
-      value: `₹${userIsOwed || 0}`,
+      value: formatMoney(Math.max(userIsOwed, 0)),
+
       subtitle:
         userIsOwed > 0
           ? "Pending collections"
           : "Nothing pending",
+
       icon: "bi-arrow-up-right-circle",
       showButton: false
     }
   ];
 
   return (
-    <div className="row g-3 mx-3 mt-3">
+    <div className="row g-3 px-5 mt-3">
 
       {cards.map((card, index) => (
 
@@ -96,17 +107,14 @@ function GroupSummaryCards({ myBalance, userOwes, userIsOwed, onSettle }) {
 
               </div>
 
-              {/* ICON */}
               <div style={{ color: PRIMARY, opacity: 0.7 }}>
                 <i className={`bi ${card.icon}`} style={{ fontSize: "20px" }} />
               </div>
 
             </div>
 
-            {/* CTA BUTTON */}
             {card.showButton && (
               <div className="mt-3">
-
                 <button
                   className="btn w-100 rounded-pill purple-btn"
                   style={{
@@ -119,7 +127,6 @@ function GroupSummaryCards({ myBalance, userOwes, userIsOwed, onSettle }) {
                 >
                   Settle Up
                 </button>
-
               </div>
             )}
 
