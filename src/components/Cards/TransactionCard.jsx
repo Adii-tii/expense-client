@@ -1,193 +1,203 @@
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 
 function TransactionCard({ settlement }) {
 
-    const user = useSelector(state => state.userDetails);
-    const navigate = useNavigate();
+  const user = useSelector(state => state.userDetails);
+  if (!settlement || !user) return null;
 
-    const isSender = settlement.fromUser?.email === user.email;
-    const isReceiver = settlement.toUser?.email === user.email;
 
-    /* ================= THEME ================= */
+  const fromEmail =
+    settlement.fromUserEmail ||
+    settlement.fromUser?.email ||
+    "";
 
-    const PRIMARY = "#7C6CF2";
-    const PRIMARY_BG = "rgba(124,108,242,0.08)";
-    const PRIMARY_SOFT = "#F1EFFF";
-    const TEXT_MAIN = "#2B2D42";
-    const TEXT_MUTED = "#6B7280";
-    const BORDER = "rgba(124,108,242,0.18)";
+  const toEmail =
+    settlement.toUserEmail ||
+    settlement.toUser?.email ||
+    "";
 
-    /* ================= DATE ================= */
+  const isSender = fromEmail === user.email;
+  const isReceiver = toEmail === user.email;
 
-    const dateObj = new Date(settlement.createdAt);
 
-    const date = dateObj.toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "short"
-    });
+  const PRIMARY = "#7C6CF2";
+  const PRIMARY_SOFT = "#F1EFFF";
+  const TEXT_MAIN = "#111827";
+  const TEXT_MUTED = "#6B7280";
+  const BORDER = "#E5E7EB";
 
-    const time = dateObj.toLocaleTimeString("en-IN", {
-        hour: "2-digit",
-        minute: "2-digit"
-    });
+  const GREEN = "#16A34A";
+  const RED = "#DC2626";
 
-    const openExpense = () => {
-        if (settlement.expenseId) {
-            navigate(`/expenses/${settlement.expenseId}`);
-        }
-    };
 
-    const getInitial = (email) =>
-        email?.[0]?.toUpperCase() || "?";
+  const dateObj = new Date(settlement.createdAt);
 
-    /* ================= UI ================= */
+  const date = dateObj.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short"
+  });
 
-    return (
-        <div
-            onClick={openExpense}
+  const time = dateObj.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+
+  const getInitial = (email) =>
+    email?.[0]?.toUpperCase() || "?";
+
+  const amountColor = isSender ? RED : isReceiver ? GREEN : TEXT_MAIN;
+
+  const directionText = isSender
+    ? "You paid"
+    : isReceiver
+    ? "You received"
+    : "Settlement";
+
+
+  return (
+    <div
+      style={{
+        background: "#FFFFFF",
+        border: `1px solid ${BORDER}`,
+        borderRadius: "16px",
+        padding: "14px 16px",
+        transition: "0.2s",
+      }}
+    >
+
+      <div className="d-flex justify-content-between align-items-center">
+
+        <div className="d-flex align-items-center gap-3">
+
+          <div
             style={{
-                background: PRIMARY_BG,
-                border: `1px solid ${BORDER}`,
-                borderRadius: "12px",
-                padding: "10px 14px",
-                cursor: settlement.expenseId ? "pointer" : "default",
-                transition: "0.2s"
+              width: "42px",
+              height: "42px",
+              borderRadius: "12px",
+              background: PRIMARY_SOFT,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
             }}
-            onMouseEnter={(e) => {
-                e.currentTarget.style.background =
-                    "rgba(124,108,242,0.14)";
-            }}
-            onMouseLeave={(e) => {
-                e.currentTarget.style.background =
-                    PRIMARY_BG;
-            }}
-        >
+          >
+            <i
+              className="bi bi-arrow-left-right"
+              style={{ color: PRIMARY, fontSize: "18px" }}
+            />
+          </div>
 
-            <div className="d-flex gap-3 align-items-center">
+          <div>
 
-                {/* ===== AMOUNT BADGE ===== */}
+            <div
+              style={{
+                fontSize: "14px",
+                fontWeight: 600,
+                color: TEXT_MAIN
+              }}
+            >
+              {directionText}
+            </div>
 
-                {/* ===== AMOUNT BADGE ===== */}
+            <div
+              className="d-flex align-items-center gap-2 mt-1"
+              style={{ fontSize: "13px" }}
+            >
 
+              <div className="d-flex align-items-center gap-1">
                 <div
-                    style={{
-                        minWidth: "64px",
-                        background: "#FFF6D6",
-                        color: "#8A6B00"     ,  // TEXT_MAIN for contrast
-                        borderRadius: "10px",
-                        fontWeight: 800,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        padding: "6px 10px",
-                        fontSize: "14px",
-                    }}
+                  style={{
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "50%",
+                    background: PRIMARY_SOFT,
+                    color: PRIMARY,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "10px",
+                    fontWeight: 600
+                  }}
                 >
-                    ₹{settlement.amount}
+                  {getInitial(fromEmail)}
                 </div>
 
+                <span style={{ color: TEXT_MAIN }}>
+                  {isSender ? "You" : fromEmail}
+                </span>
+              </div>
 
-                {/* ===== FLOW CONTENT ===== */}
+              <i
+                className="bi bi-arrow-right"
+                style={{ color: TEXT_MUTED, fontSize: "12px" }}
+              />
 
-                <div style={{ flex: 1 }}>
-
-                    {/* USERS FLOW */}
-                    <div className="d-flex align-items-center gap-2">
-
-                        {/* FROM */}
-                        <div className="d-flex align-items-center gap-2">
-
-                            <div
-                                style={{
-                                    width: "28px",
-                                    height: "28px",
-                                    borderRadius: "50%",
-                                    background: PRIMARY_SOFT,
-                                    color: PRIMARY,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    fontWeight: 600,
-                                    fontSize: "11px"
-                                }}
-                            >
-                                {getInitial(settlement.fromUser?.email)}
-                            </div>
-
-                            <span style={{ fontSize: "13px", color: TEXT_MAIN }}>
-                                {isSender ? "You" : settlement.fromUser?.email}
-                            </span>
-
-                        </div>
-
-                        {/* ARROW */}
-                        <i
-                            className="bi bi-arrow-right"
-                            style={{
-                                fontSize: "14px",
-                                color: TEXT_MUTED
-                            }}
-                        />
-
-                        {/* TO */}
-                        <div className="d-flex align-items-center gap-2">
-
-                            <span style={{ fontSize: "13px", color: TEXT_MAIN }}>
-                                {isReceiver ? "You" : settlement.toUser?.email}
-                            </span>
-
-                            <div
-                                style={{
-                                    width: "28px",
-                                    height: "28px",
-                                    borderRadius: "50%",
-                                    background: PRIMARY_SOFT,
-                                    color: PRIMARY,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    fontWeight: 600,
-                                    fontSize: "11px"
-                                }}
-                            >
-                                {getInitial(settlement.toUser?.email)}
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    {/* META */}
-                    <div
-                        style={{
-                            fontSize: "11px",
-                            color: TEXT_MUTED,
-                            marginTop: "3px",
-                            display: "flex",
-                            gap: "8px"
-                        }}
-                    >
-                        <span>{date}</span>
-                        <span>•</span>
-                        <span>{time}</span>
-
-                        {settlement.expenseId && (
-                            <>
-                                <span>•</span>
-                                <span style={{ color: PRIMARY, fontWeight: 600 }}>
-                                    Linked expense
-                                </span>
-                            </>
-                        )}
-                    </div>
-
+              <div className="d-flex align-items-center gap-1">
+                <div
+                  style={{
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "50%",
+                    background: PRIMARY_SOFT,
+                    color: PRIMARY,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "10px",
+                    fontWeight: 600
+                  }}
+                >
+                  {getInitial(toEmail)}
                 </div>
+
+                <span style={{ color: TEXT_MAIN }}>
+                  {isReceiver ? "You" : toEmail}
+                </span>
+              </div>
 
             </div>
 
+            <div
+              style={{
+                fontSize: "11px",
+                color: TEXT_MUTED,
+                marginTop: "2px"
+              }}
+            >
+              {date} • {time}
+            </div>
+
+          </div>
+
         </div>
-    );
+
+        <div style={{ textAlign: "right" }}>
+
+          <div
+            style={{
+              fontSize: "18px",
+              fontWeight: 800,
+              color: amountColor
+            }}
+          >
+            ₹{Number(settlement.amount || 0).toFixed(2)}
+          </div>
+
+          <div
+            style={{
+              fontSize: "11px",
+              color: TEXT_MUTED
+            }}
+          >
+            Settlement
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
 }
 
 export default TransactionCard;
