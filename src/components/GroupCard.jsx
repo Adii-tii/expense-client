@@ -28,7 +28,7 @@ function GroupCard({
     e.stopPropagation();
     try {
       await axios.delete(
-        `${serverEndpoint}/group/${group._id}/delete`,
+        `${serverEndpoint}/groups/${group._id}/delete`,
         { withCredentials: true }
       );
       refreshGroups();
