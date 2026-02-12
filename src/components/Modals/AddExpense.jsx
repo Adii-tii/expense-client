@@ -4,25 +4,35 @@ import { serverEndpoint } from "../../config/appConfig";
 import { useSelector } from "react-redux";
 
 const PRIMARY = "#7C6CF2";
-const BORDER = "#E5E7EB";
 const TEXT_MUTED = "#6B7280";
 
-/* ===== ROUNDING ===== */
 const round2 = (num) =>
-  Math.round((Number(num) + Number.EPSILON) * 100) / 100;
+  Math.round((Number(num || 0) + Number.EPSILON) * 100) / 100;
+
+const isClose = (a, b) => Math.abs(a - b) < 0.01;
+
+const EXPENSE_CATEGORIES = [
+  { name: "Food", icon: "bi-cup-hot" },
+  { name: "Travel", icon: "bi-airplane" },
+  { name: "Shopping", icon: "bi-bag" },
+  { name: "Bills", icon: "bi-receipt" },
+  { name: "Entertainment", icon: "bi-film" },
+  { name: "Health", icon: "bi-heart-pulse" },
+  { name: "Other", icon: "bi-three-dots" }
+];
 
 function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
 
-  const user = useSelector(state => state.userDetails);
   const groupMembers = group?.memberEmail || [];
-
-  /* ---------------- STATE ---------------- */
 
   const [step, setStep] = useState(1);
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState("INR");
   const [splitType, setSplitType] = useState("equal");
+
+  const [category, setCategory] = useState("Other");
+  const [customCategory, setCustomCategory] = useState("");
 
   const [participants, setParticipants] = useState([]);
   const [payments, setPayments] = useState({});
@@ -31,7 +41,7 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  /* ---------------- RESET ---------------- */
+  /* ---------- RESET ---------- */
 
   const reset = () => {
     setStep(1);
@@ -40,13 +50,14 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
     setParticipants([]);
     setPayments({});
     setSplits({});
+    setCategory("Other");
+    setCustomCategory("");
     setError("");
   };
 
-  /* ---------------- INIT ---------------- */
+  /* ---------- INIT ---------- */
 
   useEffect(() => {
-
     if (!isOpen) return;
 
     setParticipants(groupMembers);
@@ -64,15 +75,19 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
 
   }, [isOpen, groupMembers]);
 
+  /* ---------- DERIVED ---------- */
 
-  /* ---------------- DERIVED ---------------- */
+  const numAmount = round2(amount);
+
+  const finalCategory =
+    category === "Other" && customCategory.trim()
+      ? customCategory.trim()
+      : category;
 
   const equalShare = useMemo(() => {
-
-    if (!participants.length || !amount) return 0;
-    return round2(Number(amount) / participants.length);
-
-  }, [participants, amount]);
+    if (!participants.length || !numAmount) return 0;
+    return round2(numAmount / participants.length);
+  }, [participants, numAmount]);
 
   const totalPaid = round2(
     Object.values(payments).reduce((a, b) => a + Number(b || 0), 0)
@@ -82,39 +97,27 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
     Object.values(splits).reduce((a, b) => a + Number(b || 0), 0)
   );
 
-  /* ---------------- VALIDATION ---------------- */
+  /* ---------- VALIDATION ---------- */
 
   const validate = () => {
 
-    if (!title.trim()) return "Expense title is required";
-    if (!amount || amount <= 0) return "Enter valid amount";
-    if (!participants.length) return "Select at least one participant";
+    if (!title.trim()) return "Expense title required";
+    if (!numAmount || numAmount <= 0) return "Enter valid amount";
+    if (!participants.length) return "Select participants";
 
-    if (totalPaid !== Number(amount))
-      return "Paid amount must equal total expense";
+    if (category === "Other" && !customCategory.trim())
+      return "Enter custom category";
 
-    if (splitType === "unequal" && totalSplit !== Number(amount))
-      return "Split amount must equal total expense";
+    if (!isClose(totalPaid, numAmount))
+      return "Paid amount must match total";
+
+    if (splitType === "unequal" && !isClose(totalSplit, numAmount))
+      return "Split must match total";
 
     return null;
   };
 
-  /* ---------------- TOGGLE PARTICIPANTS ---------------- */
-
-  const toggleParticipant = (email) => {
-
-    if (participants.includes(email)) {
-
-      setParticipants(prev => prev.filter(p => p !== email));
-
-    } else {
-
-      setParticipants(prev => [...prev, email]);
-
-    }
-  };
-
-  /* ---------------- SUBMIT ---------------- */
+  /* ---------- SUBMIT ---------- */
 
   const handleSubmit = async () => {
 
@@ -127,21 +130,22 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
 
       const payload = {
         title,
+        category: finalCategory,
         currency,
-        amount: round2(amount),
+        amount: numAmount,
         splitType,
         paidBy: participants.map(email => ({
           email,
-          amount: round2(payments[email] || 0)
+          amount: round2(payments[email])
         })),
         splits: participants.map(email => ({
           email,
           share: splitType === "equal"
             ? equalShare
-            : round2(splits[email] || 0),
+            : round2(splits[email]),
           remaining: splitType === "equal"
             ? equalShare
-            : round2(splits[email] || 0)
+            : round2(splits[email])
         }))
       };
 
@@ -161,35 +165,33 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
       setLoading(false);
     }
   };
-  if (!isOpen) return null;
 
-  /* ---------------- UI ---------------- */
+  if (!isOpen) return null;
 
   return (
     <div className="modal show d-block" style={{ background: "rgba(0,0,0,0.4)" }}>
       <div className="modal-dialog modal-dialog-centered modal-lg">
         <div className="modal-content rounded-4 border-0 shadow-lg">
 
-          {/* HEADER */}
           <div className="modal-header border-0">
             <div>
               <h5 className="fw-semibold mb-1">Add Expense</h5>
               <small style={{ color: TEXT_MUTED }}>Step {step} of 3</small>
             </div>
 
-            <button className="btn-close" onClick={() => { reset(); setIsOpen(false); }} />
+            <button
+              className="btn-close"
+              onClick={() => { reset(); setIsOpen(false); }}
+            />
           </div>
 
           <div className="modal-body">
 
-            {error && (
-              <div className="alert alert-danger">{error}</div>
-            )}
+            {error && <div className="alert alert-danger">{error}</div>}
 
-            {/* ===== STEP 1 ===== */}
+            {/* STEP 1 */}
             {step === 1 && (
               <>
-                <h6 className="mb-3 fw-semibold">Expense Details</h6>
 
                 <input
                   className="form-control mb-3"
@@ -222,7 +224,51 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                   </div>
                 </div>
 
-                <h6 className="mb-2 fw-semibold">Participants</h6>
+                {/* CATEGORY */}
+                <h6 className="mb-2 fw-semibold">Category</h6>
+
+                <div className="row g-2 mb-2">
+                  {EXPENSE_CATEGORIES.map(cat => {
+
+                    const active = category === cat.name;
+
+                    return (
+                      <div key={cat.name} className="col-3">
+                        <div
+                          className="p-2 rounded-3 text-center"
+                          style={{
+                            cursor: "pointer",
+                            border: `1px solid ${active ? PRIMARY : "#E5E7EB"}`,
+                            background: active ? "#F1EFFF" : "white"
+                          }}
+                          onClick={() => setCategory(cat.name)}
+                        >
+                          <i
+                            className={`bi ${cat.icon}`}
+                            style={{
+                              fontSize: "18px",
+                              color: active ? PRIMARY : TEXT_MUTED
+                            }}
+                          />
+                          <div style={{ fontSize: "12px" }}>{cat.name}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* CUSTOM CATEGORY INPUT */}
+                {category === "Other" && (
+                  <input
+                    className="form-control mb-3"
+                    placeholder="Enter custom category"
+                    value={customCategory}
+                    onChange={(e) => setCustomCategory(e.target.value)}
+                  />
+                )}
+
+                {/* PARTICIPANTS */}
+                <h6>Participants</h6>
 
                 <div className="d-flex flex-wrap gap-2">
                   {groupMembers.map(email => (
@@ -237,24 +283,29 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                           ? "white"
                           : "#111827"
                       }}
-                      onClick={() => toggleParticipant(email)}
+                      onClick={() =>
+                        setParticipants(prev =>
+                          prev.includes(email)
+                            ? prev.filter(p => p !== email)
+                            : [...prev, email]
+                        )
+                      }
                     >
                       {email}
                     </button>
                   ))}
                 </div>
-              </>
-            )}
 
-            {/* ===== STEP 2 ===== */}
+              </>
+            )
+          }
+
+            {/* STEP 2 */}
             {step === 2 && (
               <>
-                <h6 className="mb-3 fw-semibold">Who Paid?</h6>
-
                 {participants.map(email => (
-                  <div key={email} className="row align-items-center mb-2">
+                  <div key={email} className="row mb-2">
                     <div className="col-6">{email}</div>
-
                     <div className="col-6">
                       <input
                         type="number"
@@ -264,23 +315,20 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                         onChange={(e) =>
                           setPayments(prev => ({
                             ...prev,
-                            [email]: round2(e.target.value)
+                            [email]: e.target.value
                           }))
                         }
                       />
                     </div>
                   </div>
                 ))}
-
                 <small>Total Paid ₹{totalPaid.toFixed(2)}</small>
               </>
             )}
 
-            {/* ===== STEP 3 ===== */}
+            {/* STEP 3 */}
             {step === 3 && (
               <>
-                <h6 className="mb-3 fw-semibold">Split Method</h6>
-
                 <div className="mb-3">
                   {["equal", "unequal"].map(type => (
                     <button
@@ -298,9 +346,7 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                 </div>
 
                 {splitType === "equal" && (
-                  <div>
-                    Each pays ₹{equalShare.toFixed(2)}
-                  </div>
+                  <div>Each pays ₹{equalShare.toFixed(2)}</div>
                 )}
 
                 {splitType === "unequal" && (
@@ -308,7 +354,6 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                     {participants.map(email => (
                       <div key={email} className="row mb-2">
                         <div className="col-6">{email}</div>
-
                         <div className="col-6">
                           <input
                             type="number"
@@ -318,14 +363,13 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                             onChange={(e) =>
                               setSplits(prev => ({
                                 ...prev,
-                                [email]: round2(e.target.value)
+                                [email]: e.target.value
                               }))
                             }
                           />
                         </div>
                       </div>
                     ))}
-
                     <small>Total Split ₹{totalSplit.toFixed(2)}</small>
                   </>
                 )}
@@ -334,7 +378,6 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
 
           </div>
 
-          {/* FOOTER */}
           <div className="modal-footer border-0">
 
             <button
