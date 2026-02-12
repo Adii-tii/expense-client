@@ -5,7 +5,6 @@ function TransactionCard({ settlement }) {
   const user = useSelector(state => state.userDetails);
   if (!settlement || !user) return null;
 
-
   const fromEmail =
     settlement.fromUserEmail ||
     settlement.fromUser?.email ||
@@ -19,7 +18,6 @@ function TransactionCard({ settlement }) {
   const isSender = fromEmail === user.email;
   const isReceiver = toEmail === user.email;
 
-
   const PRIMARY = "#7C6CF2";
   const PRIMARY_SOFT = "#F1EFFF";
   const TEXT_MAIN = "#111827";
@@ -28,6 +26,14 @@ function TransactionCard({ settlement }) {
 
   const GREEN = "#16A34A";
   const RED = "#DC2626";
+
+  const directionIcon = isSender
+    ? "bi-arrow-up-right"
+    : isReceiver
+      ? "bi-arrow-down-right"
+      : "bi-arrow-left-right";
+
+  const iconColor = isSender ? RED : isReceiver ? GREEN : PRIMARY;
 
 
   const dateObj = new Date(settlement.createdAt);
@@ -42,7 +48,6 @@ function TransactionCard({ settlement }) {
     minute: "2-digit"
   });
 
-
   const getInitial = (email) =>
     email?.[0]?.toUpperCase() || "?";
 
@@ -51,9 +56,8 @@ function TransactionCard({ settlement }) {
   const directionText = isSender
     ? "You paid"
     : isReceiver
-    ? "You received"
-    : "Settlement";
-
+      ? "You received"
+      : "Settlement";
 
   return (
     <div
@@ -65,7 +69,6 @@ function TransactionCard({ settlement }) {
         transition: "0.2s",
       }}
     >
-
       <div className="d-flex justify-content-between align-items-center">
 
         <div className="d-flex align-items-center gap-3">
@@ -82,8 +85,8 @@ function TransactionCard({ settlement }) {
             }}
           >
             <i
-              className="bi bi-arrow-left-right"
-              style={{ color: PRIMARY, fontSize: "18px" }}
+              className={`bi ${directionIcon}`}
+              style={{ color: iconColor, fontSize: "18px" }}
             />
           </div>
 
@@ -195,7 +198,6 @@ function TransactionCard({ settlement }) {
         </div>
 
       </div>
-
     </div>
   );
 }

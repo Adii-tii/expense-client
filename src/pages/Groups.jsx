@@ -66,6 +66,22 @@ function Groups() {
     }
   };
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f8f9fa"
+        }}
+      >
+        <BeatLoader color="black" size={15} />
+      </div>
+    );
+  }
+
   return (
     <div className="container-fluid bg-light px-5 py-5">
 
