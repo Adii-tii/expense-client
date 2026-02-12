@@ -22,6 +22,7 @@ function Groups() {
   const [limit, setLimit] = useState(8);
   const [sortBy, setSortBy] = useState("newest");
 
+
   const fetchGroups = async (page = 1) => {
     try {
       setLoading(true);
