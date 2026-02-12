@@ -17,6 +17,21 @@ function ExpenseCard({ expense, onClick }) {
   const GREEN = "#16A34A";
   const RED = "#DC2626";
 
+  /* ===== CATEGORY ICON MAP ===== */
+
+  const CATEGORY_ICONS = {
+    Food: "bi-cup-hot",
+    Travel: "bi-airplane",
+    Shopping: "bi-bag",
+    Bills: "bi-receipt",
+    Entertainment: "bi-film",
+    Health: "bi-heart-pulse",
+    Other: "bi-three-dots"
+  };
+
+  const categoryIcon =
+    CATEGORY_ICONS[expense.category] || "bi-tag";
+
   /* ===== DATA ===== */
 
   const splits = expense?.splits || [];
@@ -92,7 +107,7 @@ function ExpenseCard({ expense, onClick }) {
           }}
         >
           {day}
-        </div>  
+        </div>
 
         <div
           style={{
@@ -131,7 +146,7 @@ function ExpenseCard({ expense, onClick }) {
           }}
         >
           <i
-            className="bi bi-receipt"
+            className={`bi ${categoryIcon}`}
             style={{ fontSize: "50px", color: PRIMARY }}
           />
         </div>
@@ -159,6 +174,15 @@ function ExpenseCard({ expense, onClick }) {
                   fontSize: "11px",
                   color: TEXT_MUTED,
                   marginTop: "2px"
+                }}
+              >
+                {expense.category}
+              </div>
+
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: TEXT_MUTED
                 }}
               >
                 {time}

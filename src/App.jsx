@@ -19,6 +19,7 @@ import Profile from "./pages/Profile.jsx";
 import ManagePayments from "./pages/ManagePayments.jsx";
 import ManageSubscription from "./pages/ManageSubscriptions.jsx";
 import Transactions from "./pages/Transactions.jsx";
+import Balances from "./pages/Balances.jsx";
   
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 //value of user details represents whether the user is logged in or not/ userSelector takes in 1 func as input and redux calls the fucntion that you pass to useSelector with all the values its storing or managaing. we need to take out userdetails since we are only interested in userDetails object.
@@ -189,6 +190,15 @@ function App() {
       element={
         userDetails
         ? <UserLayout ><Transactions /></UserLayout>
+        : <Navigate to="/login"/>
+      }
+      />
+
+      <Route
+      path = "/balances"
+      element={
+        userDetails
+        ? <UserLayout ><Balances /></UserLayout>
         : <Navigate to="/login"/>
       }
       />
