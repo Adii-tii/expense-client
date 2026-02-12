@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import { serverEndpoint } from "../../config/appConfig";
 import { useSelector } from "react-redux";
+import { serverEndpoint } from "../../config/appConfig";
 
 const PRIMARY = "#7C6CF2";
+const PRIMARY_SOFT = "#F1EFFF";
 const TEXT_MUTED = "#6B7280";
 
 const round2 = (num) =>
@@ -23,6 +24,9 @@ const EXPENSE_CATEGORIES = [
 
 function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
 
+  const user = useSelector((s) => s.userDetails);
+  const currentUserEmail = user?.email;
+
   const groupMembers = group?.memberEmail || [];
 
   const [step, setStep] = useState(1);
@@ -35,11 +39,16 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
   const [customCategory, setCustomCategory] = useState("");
 
   const [participants, setParticipants] = useState([]);
+  const [payers, setPayers] = useState([]);
   const [payments, setPayments] = useState({});
   const [splits, setSplits] = useState({});
 
+  const [showAddDropdown, setShowAddDropdown] = useState(false);
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const numAmount = round2(amount);
 
   /* ---------- RESET ---------- */
 
@@ -48,6 +57,7 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
     setTitle("");
     setAmount("");
     setParticipants([]);
+    setPayers([]);
     setPayments({});
     setSplits({});
     setCategory("Other");
@@ -62,22 +72,43 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
 
     setParticipants(groupMembers);
 
-    const pay = {};
-    const split = {};
-
-    groupMembers.forEach(e => {
-      pay[e] = 0;
-      split[e] = 0;
-    });
-
-    setPayments(pay);
-    setSplits(split);
+    const splitInit = {};
+    groupMembers.forEach(e => splitInit[e] = 0);
+    setSplits(splitInit);
 
   }, [isOpen, groupMembers]);
 
-  /* ---------- DERIVED ---------- */
+  /* ---------- INIT PAYERS (STEP 2) ---------- */
 
-  const numAmount = round2(amount);
+  useEffect(() => {
+    if (!currentUserEmail) return;
+
+    setPayers([currentUserEmail]);
+
+    setPayments({
+      [currentUserEmail]: numAmount
+    });
+
+  }, [step]);
+
+  /* ---------- MAIN USER AUTO BALANCE ---------- */
+
+  useEffect(() => {
+
+    if (!payers.includes(currentUserEmail)) return;
+
+    const othersTotal = Object.entries(payments)
+      .filter(([email]) => email !== currentUserEmail)
+      .reduce((a, [, v]) => a + Number(v || 0), 0);
+
+    setPayments(prev => ({
+      ...prev,
+      [currentUserEmail]: round2(numAmount - othersTotal)
+    }));
+
+  }, [payments, numAmount]);
+
+  /* ---------- DERIVED ---------- */
 
   const finalCategory =
     category === "Other" && customCategory.trim()
@@ -89,30 +120,59 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
     return round2(numAmount / participants.length);
   }, [participants, numAmount]);
 
+  useEffect(() => {
+    if (splitType !== "equal") return;
+
+    const next = {};
+    participants.forEach(p => next[p] = equalShare);
+    setSplits(next);
+
+  }, [equalShare, splitType, participants]);
+
   const totalPaid = round2(
     Object.values(payments).reduce((a, b) => a + Number(b || 0), 0)
   );
 
-  const totalSplit = round2(
-    Object.values(splits).reduce((a, b) => a + Number(b || 0), 0)
-  );
+  /* ---------- ADD / REMOVE PAYERS ---------- */
+
+  const addPayer = (email) => {
+    setPayers(prev => [...prev, email]);
+
+    setPayments(prev => ({
+      ...prev,
+      [email]: ""
+    }));
+
+    setShowAddDropdown(false);
+  };
+
+  const removePayer = (email) => {
+    setPayers(prev => prev.filter(p => p !== email));
+
+    setPayments(prev => {
+      const copy = { ...prev };
+      delete copy[email];
+      return copy;
+    });
+  };
 
   /* ---------- VALIDATION ---------- */
 
-  const validate = () => {
+  const validateStep = (target) => {
 
-    if (!title.trim()) return "Expense title required";
-    if (!numAmount || numAmount <= 0) return "Enter valid amount";
-    if (!participants.length) return "Select participants";
+    if (target === 2) {
+      if (!title.trim()) return "Expense title required";
+      if (!numAmount || numAmount <= 0) return "Enter valid amount";
+      if (!participants.length) return "Select participants";
 
-    if (category === "Other" && !customCategory.trim())
-      return "Enter custom category";
+      if (category === "Other" && !customCategory.trim())
+        return "Enter custom category";
+    }
 
-    if (!isClose(totalPaid, numAmount))
-      return "Paid amount must match total";
-
-    if (splitType === "unequal" && !isClose(totalSplit, numAmount))
-      return "Split must match total";
+    if (target === 3) {
+      if (!isClose(totalPaid, numAmount))
+        return "Paid amount mismatch";
+    }
 
     return null;
   };
@@ -121,8 +181,14 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
 
   const handleSubmit = async () => {
 
-    const err = validate();
-    if (err) return setError(err);
+    if (splitType === "unequal") {
+
+      const totalSplit = Object.values(splits)
+        .reduce((a, b) => a + Number(b || 0), 0);
+
+      if (!isClose(totalSplit, numAmount))
+        return setError("Split mismatch");
+    }
 
     setLoading(true);
 
@@ -134,18 +200,14 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
         currency,
         amount: numAmount,
         splitType,
-        paidBy: participants.map(email => ({
+        paidBy: payers.map(email => ({
           email,
           amount: round2(payments[email])
         })),
         splits: participants.map(email => ({
           email,
-          share: splitType === "equal"
-            ? equalShare
-            : round2(splits[email]),
-          remaining: splitType === "equal"
-            ? equalShare
-            : round2(splits[email])
+          share: round2(splits[email]),
+          remaining: round2(splits[email])
         }))
       };
 
@@ -164,6 +226,13 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleNext = () => {
+    const err = validateStep(step + 1);
+    if (err) return setError(err);
+    setError("");
+    setStep(p => p + 1);
   };
 
   if (!isOpen) return null;
@@ -192,7 +261,6 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
             {/* STEP 1 */}
             {step === 1 && (
               <>
-
                 <input
                   className="form-control mb-3"
                   placeholder="Expense title"
@@ -204,7 +272,6 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                   <div className="col-8">
                     <input
                       type="number"
-                      step="0.01"
                       className="form-control"
                       placeholder="Amount"
                       value={amount}
@@ -224,7 +291,6 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                   </div>
                 </div>
 
-                {/* CATEGORY */}
                 <h6 className="mb-2 fw-semibold">Category</h6>
 
                 <div className="row g-2 mb-2">
@@ -243,13 +309,7 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                           }}
                           onClick={() => setCategory(cat.name)}
                         >
-                          <i
-                            className={`bi ${cat.icon}`}
-                            style={{
-                              fontSize: "18px",
-                              color: active ? PRIMARY : TEXT_MUTED
-                            }}
-                          />
+                          <i className={`bi ${cat.icon}`} />
                           <div style={{ fontSize: "12px" }}>{cat.name}</div>
                         </div>
                       </div>
@@ -257,7 +317,6 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                   })}
                 </div>
 
-                {/* CUSTOM CATEGORY INPUT */}
                 {category === "Other" && (
                   <input
                     className="form-control mb-3"
@@ -267,7 +326,6 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                   />
                 )}
 
-                {/* PARTICIPANTS */}
                 <h6>Participants</h6>
 
                 <div className="d-flex flex-wrap gap-2">
@@ -295,34 +353,71 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                     </button>
                   ))}
                 </div>
-
               </>
-            )
-          }
+            )}
 
             {/* STEP 2 */}
             {step === 2 && (
               <>
-                {participants.map(email => (
-                  <div key={email} className="row mb-2">
-                    <div className="col-6">{email}</div>
-                    <div className="col-6">
-                      <input
-                        type="number"
-                        step="0.01"
-                        className="form-control text-end"
-                        value={payments[email] || ""}
-                        onChange={(e) =>
-                          setPayments(prev => ({
-                            ...prev,
-                            [email]: e.target.value
-                          }))
-                        }
-                      />
-                    </div>
+                {payers.map(email => (
+                  <div key={email} className="d-flex align-items-center mb-2">
+
+                    <div style={{ flex: 1 }}>{email}</div>
+
+                    <input
+                      type="number"
+                      className="form-control text-end"
+                      style={{ width: 150 }}
+                      value={payments[email] ?? ""}
+                      onChange={(e) =>
+                        setPayments(prev => ({
+                          ...prev,
+                          [email]: e.target.value
+                        }))
+                      }
+                    />
+
+                    {email !== currentUserEmail && (
+                      <button
+                        className="btn btn-sm ms-2"
+                        onClick={() => removePayer(email)}
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
                 ))}
-                <small>Total Paid ₹{totalPaid.toFixed(2)}</small>
+
+                <div
+                  className="p-3 text-center rounded-3 mt-3"
+                  style={{
+                    border: `2px dashed ${PRIMARY}`,
+                    background: PRIMARY_SOFT,
+                    cursor: "pointer"
+                  }}
+                  onClick={() => setShowAddDropdown(v => !v)}
+                >
+                  + Add payer
+                </div>
+
+                {showAddDropdown && (
+                  <select
+                    className="form-select mt-2"
+                    onChange={(e) => addPayer(e.target.value)}
+                  >
+                    <option>Select participant</option>
+
+                    {participants
+                      .filter(p => !payers.includes(p))
+                      .map(p => (
+                        <option key={p}>{p}</option>
+                      ))}
+                  </select>
+                )}
+
+                <div className="text-end mt-2 fw-semibold">
+                  Total Paid ₹{totalPaid.toFixed(2)}
+                </div>
               </>
             )}
 
@@ -350,28 +445,25 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
                 )}
 
                 {splitType === "unequal" && (
-                  <>
-                    {participants.map(email => (
-                      <div key={email} className="row mb-2">
-                        <div className="col-6">{email}</div>
-                        <div className="col-6">
-                          <input
-                            type="number"
-                            step="0.01"
-                            className="form-control text-end"
-                            value={splits[email] || ""}
-                            onChange={(e) =>
-                              setSplits(prev => ({
-                                ...prev,
-                                [email]: e.target.value
-                              }))
-                            }
-                          />
-                        </div>
-                      </div>
-                    ))}
-                    <small>Total Split ₹{totalSplit.toFixed(2)}</small>
-                  </>
+                  participants.map(email => (
+                    <div key={email} className="d-flex mb-2">
+
+                      <div style={{ flex: 1 }}>{email}</div>
+
+                      <input
+                        type="number"
+                        className="form-control text-end"
+                        style={{ width: 150 }}
+                        value={splits[email] ?? ""}
+                        onChange={(e) =>
+                          setSplits(prev => ({
+                            ...prev,
+                            [email]: e.target.value
+                          }))
+                        }
+                      />
+                    </div>
+                  ))
                 )}
               </>
             )}
@@ -393,7 +485,7 @@ function AddExpense({ setIsOpen, isOpen, group, refreshExpenses }) {
               className="btn text-white"
               style={{ background: PRIMARY }}
               disabled={loading}
-              onClick={() => step < 3 ? setStep(step + 1) : handleSubmit()}
+              onClick={() => step < 3 ? handleNext() : handleSubmit()}
             >
               {loading ? "Saving..." : step === 3 ? "Add Expense" : "Next"}
             </button>
