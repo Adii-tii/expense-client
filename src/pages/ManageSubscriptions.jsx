@@ -59,9 +59,10 @@ function ManageSubscription() {
     getUserProfile();
   }, []);
 
-  /* ================= CAPTURE SUB ================= */
 
   const rzpResponseHandler = async (response) => {
+    console.log("we are here....");
+
 
     try {
 
@@ -72,6 +73,8 @@ function ManageSubscription() {
         { subscriptionId: response.razorpay_subscription_id },
         { withCredentials: true }
       );
+
+      console.log("res??" , captureRes);
 
       setUserProfile(captureRes.data.user);
       setMessage("Subscription activated successfully");
@@ -95,7 +98,10 @@ function ManageSubscription() {
         `${serverEndpoint}/payments/create-subscription`,
         { plan_name: planKey },
         { withCredentials: true }
-      );
+      );  
+      
+      console.log("res received");
+
 
       const subscription = createRes.data.subscription;
 
@@ -107,11 +113,13 @@ function ManageSubscription() {
         description: `Pay ₹${plan.price} per ${plan.frequency}`,
         subscription_id: subscription.id,
         theme: { color: "#7C6CF2" },
-        handler: rzpResponseHandler
+        handler: (res) => rzpResponseHandler(res)
       };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      console.log("before opening window");
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
 
     } catch {
       setErrors({ message: "Unable to process subscription" });
@@ -120,7 +128,6 @@ function ManageSubscription() {
     }
   };
 
-  /* ================= LOADING ================= */
 
   if (loading) {
     return (
