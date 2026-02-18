@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import { useNavigate } from "react-router-dom";
 import { serverEndpoint } from "../config/appConfig.js";
 
-function Register({refreshAuth}) {
+function Register({ refreshAuth }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -52,15 +52,15 @@ function Register({refreshAuth}) {
     if (!validate()) return;
 
     try {
-        console.log(formData)
+      console.log(formData)
       const res = await axios.post(
         `${serverEndpoint}/auth/register`,
-        formData, {withCredentials:true}
+        formData, { withCredentials: true }
       );
 
       console.log(res);
 
-      setMessage(`Successfully registered as ${formData.username}`);      
+      setMessage(`Successfully registered as ${formData.username}`);
       setErrors({});
       await refreshAuth();
       navigate('/dashboard');
@@ -141,8 +141,10 @@ function Register({refreshAuth}) {
             )}
           </div>
 
-          <Button variant="success" className="w-100" type="submit">
-            Sign up
+          <Button type="submit" variant="dark" className="w-100 btn border-0 rounded-pill px-3 text-white mt-4" style={{
+            background: "#7C6CF2",
+          }}>
+            Register
           </Button>
 
           {message && (
