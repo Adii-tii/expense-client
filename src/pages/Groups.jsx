@@ -182,13 +182,17 @@ function Groups() {
 
       ) : groups.length === 0 ? (
 
-        <div className="card border-0 shadow-sm text-center py-5">
+        <div className="card border-0 bg-light d-flex text-center py-5 w-25 mx-auto">
           <h5 className="fw-semibold mb-2">No Groups Yet</h5>
           <p className="text-muted mb-4">
             Create a group and start splitting expenses.
           </p>
-          <button className="btn btn-dark" onClick={handleCreate}>
-            Create Your First Group
+          <button type="submit" className="btn border-0 rounded-pill px-3 text-white mx-auto" style={{
+            background: "#7C6CF2",
+            width: "200px",
+            height: "40px"
+          }} onClick = {handleCreate}>
+            Create
           </button>
         </div>
 
