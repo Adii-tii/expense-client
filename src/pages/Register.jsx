@@ -3,9 +3,12 @@ import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import { useNavigate } from "react-router-dom";
 import { serverEndpoint } from "../config/appConfig.js";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google"
+
 
 function Register({ refreshAuth }) {
   const navigate = useNavigate();
+  const [messages, setMessages] = useState();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -73,8 +76,29 @@ function Register({ refreshAuth }) {
     }
   };
 
+  const handleGoogleSuccess = async (authResponse) => {
+    console.log(JSON.stringify(authResponse));
+
+    const idToken = authResponse.credential;
+    const res = await axios.post(`${serverEndpoint}/auth/google-auth`, { idToken }, { withCredentials: true });
+    console.log("Signed up successfully:", res);
+    setMessages({ login: "Created your new account!" });
+    await refreshAuth();
+    console.log("about to navigate");
+    navigate('/dashboard');
+  };
+
+  const handleGoogleFailure = (error) => {
+    console.log(error);
+  }
+
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+      {messages && (
+        <div className="alrt" role="alert">
+          {messages}
+        </div>
+      )}
       <div className="bg-white p-4 shadow-sm" style={{ width: "480px" }}>
         <form onSubmit={handleFormSubmit}>
           <div className="text-center mb-4">
@@ -160,13 +184,12 @@ function Register({ refreshAuth }) {
           <hr className="flex-grow-1" />
         </div>
 
-        <Button
-          type="button"
-          variant="light"
-          className="w-100 border border-secondary"
-        >
-          Sign up with Google
-        </Button>
+        <div>
+          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+            <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleFailure} />
+          </GoogleOAuthProvider>
+
+        </div>
 
         <div className="mt-3 text-center">
           Already have an account?{" "}

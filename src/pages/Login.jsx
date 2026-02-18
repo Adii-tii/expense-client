@@ -15,6 +15,7 @@ function Login({ refreshAuth }) {
 
   const [errors, setErrors] = useState({});
   const [message, setMessages] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -149,14 +150,31 @@ function Login({ refreshAuth }) {
                 Forgot password?
               </a>
             </div>
-            <input
-              type="password"
-              className="form-control"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-            />
+            <div className="position-relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                className="form-control pe-5"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+              />
+
+              <span
+                onClick={() => setShowPassword(p => !p)}
+                style={{
+                  position: "absolute",
+                  right: "12px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer"
+                }}
+              >
+                <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+              </span>
+            </div>
+
+
             {errors.password && (
               <div className="text-danger small mt-1">{errors.password}</div>
             )}
