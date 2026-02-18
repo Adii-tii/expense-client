@@ -29,7 +29,7 @@ function App() {
   const userDetails = useSelector(state => state.userDetails);
   const [loading, setLoading] = useState(true);
 
-  const getUser = async () => { //make this getUser()
+  const getUser = async () => {
     try {
       const res = await axios.get(`${serverEndpoint}/auth/get-user`, { withCredentials: true });
       console.log(res.data)

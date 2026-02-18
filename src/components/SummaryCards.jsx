@@ -8,7 +8,7 @@ function SummaryCards() {
     totalBalance: 0,
     totalOwe: 0,
     totalOwed: 0,
-    monthlyTotal: 0
+    totalSpendings: 0
   });
 
   const fetchSummary = async () => {
@@ -47,8 +47,8 @@ function SummaryCards() {
       icon: "bi-arrow-down-left",
     },
     {
-      title: "This Month",
-      value: `₹${summary.monthlyTotal.toFixed(2)}`,
+      title: "Total Spendings",
+      value: `₹${summary.totalSpendings.toFixed(2)}`,
       icon: "bi-calendar3",
     },
   ];

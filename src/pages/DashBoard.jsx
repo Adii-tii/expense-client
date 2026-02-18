@@ -115,7 +115,7 @@ function Dashboard() {
         <div className="col-lg-8">
 
           <div
-            className="bg-white p-4 rounded-4 shadow-sm"
+            className="bg-white p-4 rounded-4 border-0"
             style={{ border: "1px solid #ECECF2" }}
           >
 
@@ -181,7 +181,7 @@ function Dashboard() {
         <div className="col-lg-4">
 
           <div
-            className="bg-white p-4 rounded-4 shadow-sm h-100"
+            className="bg-white p-4 rounded-4 border-0 h-100"
             style={{ border: "1px solid #ECECF2" }}
           >
             <div className="d-flex justify-content-between mb-3">
@@ -211,7 +211,7 @@ function Dashboard() {
 
               {!loadingDebts && debts.length === 0 && (
                 <div className="text-center text-muted py-3">
-                  You're all settled 🎉
+                  You're all settled.
                 </div>
               )}
 
@@ -241,7 +241,7 @@ function Dashboard() {
         <div className="col-12">
 
           <div
-            className="bg-white p-4 rounded-4 shadow-sm"
+            className="bg-white p-4 rounded-4 border-0"
             style={{ border: "1px solid #ECECF2" }}
           >
 
@@ -263,11 +263,18 @@ function Dashboard() {
                   </div>
                 ))}
 
+
               {categories.map(cat => (
                 <div key={cat.category} className="col-xl-3 col-md-6">
                   <CategorySpendCard categoryData={cat} />
                 </div>
               ))}
+
+              {!loadingCategories && categories.length==0 && (
+                <div className="text-muted text-center">
+                  Start with creating an expense
+                </div>
+              )}
 
             </div>
 
