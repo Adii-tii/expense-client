@@ -1,4 +1,5 @@
 import DeleteConfirmationModal from "./Modals/DeleteConfirmationModal";
+import CreateGroupModal from "./Modals/CreateGroupModal";
 
 function GroupCardGridView({
     handleRedirection,

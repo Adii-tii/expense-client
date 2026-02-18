@@ -205,8 +205,11 @@ function Groups() {
                 group={group}
                 refreshGroups={fetchGroups}
                 setMode={setMode}
+                mode={mode}
                 setIsOpen={setIsModalOpen}
+                isOpen={isModalOpen}
                 setCurrentGroup={setCurrentGroup}
+                currentGroup={currentGroup}
                 layout={layout}
               />
             </div>
@@ -291,10 +294,10 @@ function Groups() {
       <CreateGroupModal
         isOpen={isModalOpen}
         setIsOpen={setIsModalOpen}
-        refreshGroups={fetchGroups}
         mode={mode}
-        setMode={setMode}
         currentGroup={currentGroup}
+        setMode={setMode}
+        refreshGroups={fetchGroups}
       />
     </div>
   );

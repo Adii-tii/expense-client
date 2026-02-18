@@ -9,7 +9,9 @@ function GroupCard({
   group,
   refreshGroups,
   setMode,
+  mode,
   setIsOpen,
+  isOpen,
   setCurrentGroup,
   layout
 }) {
@@ -23,13 +25,11 @@ function GroupCard({
   const visibleMembers = members.slice(0, MAX_VISIBLE_MEMBERS);
   const extraMembers = Math.max(members.length - MAX_VISIBLE_MEMBERS, 0);
 
-  /* ================= NAVIGATION ================= */
 
   const handleRedirection = () => {
     navigate(`/groups/${group._id}`, { state: { group } });
   };
 
-  /* ================= DELETE ================= */
 
   const handleDeleteGroup = async () => {
     try {
@@ -43,7 +43,6 @@ function GroupCard({
     }
   };
 
-  /* ================= EDIT ================= */
 
   const handleEditGroup = (e) => {
     e.stopPropagation();
@@ -52,7 +51,6 @@ function GroupCard({
     setIsOpen(true);
   };
 
-  /* ================= AVATAR ================= */
 
   const Avatar = ({ email, index }) => (
     <div
@@ -104,6 +102,11 @@ function GroupCard({
       showDelete={showDelete}
       handleDeleteGroup={handleDeleteGroup}
       Avatar={Avatar} 
+      setIsOpen={setIsOpen}
+      isOpen={isOpen}
+      mode={mode}
+      setMode={setMode}
+      setCurrentGroup={setCurrentGroup}
       />
   )
 
