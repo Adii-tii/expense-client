@@ -54,10 +54,11 @@ function TransactionCard({ settlement }) {
   const amountColor = isSender ? RED : isReceiver ? GREEN : TEXT_MAIN;
 
   const directionText = isSender
-    ? "You paid"
+    ? <>You <span className="text-danger">paid</span> {toEmail} ₹{settlement.amount}</>
     : isReceiver
-      ? "You received"
+      ? <>You <span className="text-success">received</span> ₹{settlement.amount} from {fromEmail}</>
       : "Settlement";
+
 
   return (
     <div
@@ -65,36 +66,41 @@ function TransactionCard({ settlement }) {
         background: "#FFFFFF",
         border: `1px solid ${BORDER}`,
         borderRadius: "16px",
-        padding: "14px 16px",
-        transition: "0.2s",
+        padding: "16px 18px",
+        transition: "0.18s",
       }}
     >
-      <div className="d-flex justify-content-between align-items-center">
+      <div className="d-flex justify-content-between">
 
-        <div className="d-flex align-items-center gap-3">
+        {/* LEFT */}
+        <div className="d-flex gap-3">
 
+          {/* ICON */}
           <div
             style={{
-              width: "42px",
-              height: "42px",
-              borderRadius: "12px",
+              width: 50,
+              height: 50,
+              borderRadius: 10,
               background: PRIMARY_SOFT,
               display: "flex",
               alignItems: "center",
-              justifyContent: "center"
+              justifyContent: "center",
+              flexShrink: 0
             }}
           >
             <i
               className={`bi ${directionIcon}`}
-              style={{ color: iconColor, fontSize: "18px" }}
+              style={{ color: iconColor, fontSize: 16 }}
             />
           </div>
 
-          <div>
+          {/* TEXT STACK */}
+          <div style={{ lineHeight: 1.2 }}>
 
+            {/* TITLE */}
             <div
               style={{
-                fontSize: "14px",
+                fontSize: 14,
                 fontWeight: 600,
                 color: TEXT_MAIN
               }}
@@ -102,84 +108,51 @@ function TransactionCard({ settlement }) {
               {directionText}
             </div>
 
-            <div
-              className="d-flex align-items-center gap-2 mt-1"
-              style={{ fontSize: "13px" }}
-            >
-
-              <div className="d-flex align-items-center gap-1">
-                <div
-                  style={{
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "50%",
-                    background: PRIMARY_SOFT,
-                    color: PRIMARY,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "10px",
-                    fontWeight: 600
-                  }}
-                >
-                  {getInitial(fromEmail)}
-                </div>
-
-                <span style={{ color: TEXT_MAIN }}>
-                  {isSender ? "You" : fromEmail}
-                </span>
+            {/* NOTE */}
+            {settlement.note && (
+              <div
+                style={{
+                  fontSize: 12,
+                  color: TEXT_MUTED,
+                  marginTop: 4,
+                  maxWidth: 260,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap"
+                }}
+              >
+                {settlement.note}
               </div>
+            )}
 
-              <i
-                className="bi bi-arrow-right"
-                style={{ color: TEXT_MUTED, fontSize: "12px" }}
-              />
-
-              <div className="d-flex align-items-center gap-1">
-                <div
-                  style={{
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "50%",
-                    background: PRIMARY_SOFT,
-                    color: PRIMARY,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "10px",
-                    fontWeight: 600
-                  }}
-                >
-                  {getInitial(toEmail)}
-                </div>
-
-                <span style={{ color: TEXT_MAIN }}>
-                  {isReceiver ? "You" : toEmail}
-                </span>
-              </div>
-
-            </div>
-
+            {/* DATE */}
             <div
               style={{
-                fontSize: "11px",
+                fontSize: 11,
                 color: TEXT_MUTED,
-                marginTop: "2px"
+                marginTop: 6
               }}
             >
               {date} • {time}
             </div>
 
           </div>
-
         </div>
 
-        <div style={{ textAlign: "right" }}>
-
+        {/* RIGHT AMOUNT */}
+        <div
+          style={{
+            textAlign: "right",
+            marginLeft: 12,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center"
+          }}
+        >
           <div
             style={{
-              fontSize: "18px",
-              fontWeight: 800,
+              fontSize: 18,
+              fontWeight: 700,
               color: amountColor
             }}
           >
@@ -188,18 +161,19 @@ function TransactionCard({ settlement }) {
 
           <div
             style={{
-              fontSize: "11px",
-              color: TEXT_MUTED
+              fontSize: 11,
+              color: TEXT_MUTED,
+              marginTop: 2
             }}
           >
             Settlement
           </div>
-
         </div>
 
       </div>
     </div>
   );
+
 }
 
 export default TransactionCard;
