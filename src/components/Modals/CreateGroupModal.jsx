@@ -12,11 +12,9 @@ function CreateGroupModal({
   mode,
   currentGroup
 }) {
-  console.log(currentGroup);
   const userDetails = useSelector((state) => state.userDetails);
 
   const [errors, setErrors] = useState({});
-  const [isGroupCreated, setIsGroupCreated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpenSuccessAlert, setIsOpenSuccessAlert] = useState(false);
 
@@ -31,6 +29,7 @@ function CreateGroupModal({
 
   const [tempEmail, setTempEmail] = useState("");
 
+  /* ================= INIT ================= */
   useEffect(() => {
     if (mode === "edit" && currentGroup) {
       setFormData({
@@ -55,9 +54,41 @@ function CreateGroupModal({
     }
   }, [mode, currentGroup, userDetails.email]);
 
+  /* ================= THUMBNAIL UPLOAD ================= */
+  const handleThumbnailUpload = async (file) => {
+    if (!file) return;
+
+    try {
+      // preview immediately
+      const preview = URL.createObjectURL(file);
+      setFormData(prev => ({ ...prev, thumbnail: preview }));
+
+      // if editing existing group → upload instantly
+      if (mode === "edit" && currentGroup?._id) {
+        const form = new FormData();
+        form.append("image", file);
+
+        const res = await axios.post(
+          `${serverEndpoint}/groups/${currentGroup._id}/thumbnail`,
+          form,
+          { withCredentials: true }
+        );
+
+        setFormData(prev => ({
+          ...prev,
+          thumbnail: res.data.thumbnail
+        }));
+      }
+
+    } catch (err) {
+      console.error("Thumbnail upload failed", err);
+    }
+  };
+
+  /* ================= FORM ================= */
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value
     }));
@@ -65,7 +96,7 @@ function CreateGroupModal({
 
   const handleAddMembers = () => {
     if (tempEmail && !formData.memberEmail.includes(tempEmail)) {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         memberEmail: [...prev.memberEmail, tempEmail]
       }));
@@ -74,7 +105,7 @@ function CreateGroupModal({
   };
 
   const handleRemoveMember = (index) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       memberEmail: prev.memberEmail.filter((_, i) => i !== index)
     }));
@@ -86,6 +117,7 @@ function CreateGroupModal({
     setTempEmail("");
   };
 
+  /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -108,12 +140,13 @@ function CreateGroupModal({
         );
 
         if (res.status === 201) {
-          setIsGroupCreated(true);
           setIsOpenSuccessAlert(true);
           refreshGroups();
           closeModal();
         }
-      } else if (mode === "edit") {
+      }
+
+      if (mode === "edit") {
         const body = {
           adminEmail: formData.adminEmail,
           name: formData.name,
@@ -121,21 +154,19 @@ function CreateGroupModal({
           thumbnail: formData.thumbnail
         };
 
-        const groupId = currentGroup._id;
-
         const res = await axios.patch(
-          `${serverEndpoint}/groups/${groupId}`,
+          `${serverEndpoint}/groups/${currentGroup._id}`,
           body,
           { withCredentials: true }
         );
 
         if (res.status === 201) {
-          setIsGroupCreated(true);
           setIsOpenSuccessAlert(true);
           refreshGroups();
           closeModal();
         }
       }
+
     } catch (error) {
       if (error.response) {
         setErrors({ general: error.response.data.message });
@@ -161,27 +192,104 @@ function CreateGroupModal({
             boxShadow: "0 18px 40px rgba(0,0,0,0.15)"
           }}
         >
-          {/* HEADER */}
-          <div
-            className="px-4 pt-4 pb-3 border-bottom"
-            style={{ borderColor: "#E6E7EC" }}
-          >
-            <div className="d-flex justify-content-between align-items-center">
-              <h5 className="fw-semibold" style={{ color: "#2B2D42" }}>
-                {mode === "create" ? "Create group" : "Edit group"}
-              </h5>
+          {/* hidden file input */}
+          <input
+            id="coverUpload"
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={(e) =>
+              handleThumbnailUpload(e.target.files[0])
+            }
+          />
 
-              <button className="btn-close" onClick={closeModal} />
+          {/* COVER HEADER (ALWAYS SHOWN) */}
+          <div
+            onClick={() =>
+              document.getElementById("coverUpload").click()
+            }
+            style={{
+              height: 160,
+              backgroundImage: formData.thumbnail
+                ? `url(${formData.thumbnail})`
+                : "linear-gradient(135deg,#7C6CF2,#7C6CF2)",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
+              position: "relative",
+              cursor: "pointer"
+            }}
+          >
+            {/* overlay */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "rgba(0,0,0,0.25)",
+                borderTopLeftRadius: 16,
+                borderTopRightRadius: 16
+              }}
+            />
+
+            {/* title */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: 14,
+                left: 18,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                color: "white",
+                fontWeight: 600,
+                fontSize: 16
+              }}
+            >
+              <span>
+                {mode === "create" ? "Create group" : "Edit group"}
+              </span>
+              <i className="bi bi-pencil-square" />
             </div>
+
+            {/* change hint */}
+            <div
+              style={{
+                position: "absolute",
+                top: 12,
+                left: 18,
+                background: "rgba(0,0,0,0.45)",
+                padding: "4px 10px",
+                borderRadius: 20,
+                fontSize: 12,
+                color: "white"
+              }}
+            >
+              {formData.thumbnail
+                ? "Change cover"
+                : "Add cover"}
+            </div>
+
+            {/* close */}
+            <button
+              className="btn-close btn-close-white"
+              style={{ position: "absolute", top: 12, right: 12 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                closeModal();
+              }}
+            />
           </div>
 
           {/* BODY */}
           <div className="px-4 py-4">
             {errors.general && (
-              <div className="alert alert-danger">{errors.general}</div>
+              <div className="alert alert-danger">
+                {errors.general}
+              </div>
             )}
 
-            {/* Group Name */}
+            {/* NAME */}
             <div className="form-floating mb-3">
               <input
                 type="text"
@@ -191,37 +299,11 @@ function CreateGroupModal({
                 value={formData.name}
                 onChange={handleChange}
                 style={{ borderBottom: "2px solid #E6E7EC" }}
-                onFocus={(e) =>
-                  (e.target.style.borderBottom = "2px solid #7C6CF2")
-                }
-                onBlur={(e) =>
-                  (e.target.style.borderBottom = "2px solid #E6E7EC")
-                }
               />
               <label>Group name</label>
             </div>
 
-            {/* Thumbnail */}
-            <div className="form-floating mb-3">
-              <input
-                type="text"
-                className="form-control border-0 border-bottom rounded-0"
-                name="thumbnail"
-                placeholder="Thumbnail"
-                value={formData.thumbnail}
-                onChange={handleChange}
-                style={{ borderBottom: "2px solid #E6E7EC" }}
-                onFocus={(e) =>
-                  (e.target.style.borderBottom = "2px solid #7C6CF2")
-                }
-                onBlur={(e) =>
-                  (e.target.style.borderBottom = "2px solid #E6E7EC")
-                }
-              />
-              <label>Thumbnail Link</label>
-            </div>
-
-            {/* Description */}
+            {/* DESCRIPTION */}
             <div className="form-floating mb-4">
               <textarea
                 className="form-control border-0 border-bottom rounded-0"
@@ -233,17 +315,11 @@ function CreateGroupModal({
                   height: "90px",
                   borderBottom: "2px solid #E6E7EC"
                 }}
-                onFocus={(e) =>
-                  (e.target.style.borderBottom = "2px solid #7C6CF2")
-                }
-                onBlur={(e) =>
-                  (e.target.style.borderBottom = "2px solid #E6E7EC")
-                }
               />
               <label>Description</label>
             </div>
 
-            {/* Participants */}
+            {/* PARTICIPANTS */}
             <div className="mb-2 fw-medium small" style={{ color: "#2B2D42" }}>
               Participants
             </div>
@@ -266,7 +342,6 @@ function CreateGroupModal({
               </button>
             </div>
 
-            {/* Member Chips */}
             <div className="d-flex flex-wrap gap-2">
               {emails.map((email, index) => (
                 <div
@@ -281,10 +356,7 @@ function CreateGroupModal({
                       className="btn btn-sm ms-2 p-0 border-0"
                       onClick={() => handleRemoveMember(index)}
                     >
-                      <i
-                        className="bi bi-x-lg small"
-                        style={{ color: "#7C6CF2" }}
-                      />
+                      <i className="bi bi-x-lg small" />
                     </button>
                   )}
                 </div>
