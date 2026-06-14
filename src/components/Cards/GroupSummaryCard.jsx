@@ -1,150 +1,267 @@
 import React from "react";
 
-function GroupSummaryCards({ myBalance = 0, userOwes = 0, userIsOwed = 0, onSettle }) {
+function GroupSummaryCards({ myBalance = 0, userOwes = 0, userIsOwed = 0, onSettle, balances = [], memberEmails = [], totalSpent = 0 }) {
 
-  const PRIMARY = "#7C6CF2";
-  const TEXT_MAIN = "#2B2D42";
-  const TEXT_MUTED = "#9CA3AF";
+  const formatMoney = (value) => `₹${Number(value).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-  const formatMoney = (value) => `₹${Number(value).toFixed(2)}`;
-
-  const cards = [
-    {
-      title: "Overall Balance",
-      value:
-        myBalance === 0
-          ? "Settled"
-          : formatMoney(Math.abs(myBalance)),
-
-      subtitle:
-        myBalance > 0
-          ? "You will receive money"
-          : myBalance < 0
-          ? "You need to pay money"
-          : "All expenses cleared",
-
-      icon: "bi-wallet2",
-      showButton: false
-    },
-
-    {
-      title: "You owe",
-      value: formatMoney(Math.max(userOwes, 0)),
-
-      subtitle:
-        userOwes > 0
-          ? "Pending payments"
-          : "Nothing to pay",
-
-      icon: "bi-arrow-down-left-circle",
-
-      showButton: userOwes > 0.01   // prevents float glitches
-    },
-
-    {
-      title: "You are owed",
-      value: formatMoney(Math.max(userIsOwed, 0)),
-
-      subtitle:
-        userIsOwed > 0
-          ? "Pending collections"
-          : "Nothing pending",
-
-      icon: "bi-arrow-up-right-circle",
-      showButton: false
-    }
-  ];
+  const visibleMembers = memberEmails.slice(0, 3);
+  const extraMembers = Math.max(memberEmails.length - 3, 0);
 
   return (
-    <div className="row g-3 px-5 mt-3">
+    <div className="row g-3 px-0 mt-3">
 
-      {cards.map((card, index) => (
-
-        <div className="col-xl-4 col-md-6 col-sm-12" key={index}>
-
-          <div
-            className="border rounded-4 h-100 p-4 minimal-card"
+      {/* CARD 1: TOTAL SPENT (Purple background) */}
+      <div className="col-xl-4 col-md-6 col-sm-12">
+        <div
+          className="rounded-4 position-relative overflow-hidden purple-card"
+          style={{
+            background: "#8E54FF",
+            cursor: "default",
+            padding: "18px 22px",
+            minHeight: "120px",
+            borderRadius: "20px"
+          }}
+        >
+          {/* Background SVG Receipt icon */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="80"
+            height="80"
+            fill="rgba(40, 13, 95, 0.08)"
+            className="bi bi-receipt"
+            viewBox="0 0 16 16"
             style={{
-              background: "white",
-              borderColor: "#F1F1F4",
-              transition: "0.2s ease"
+              position: "absolute",
+              right: "-5px",
+              bottom: "-10px",
+              pointerEvents: "none"
             }}
           >
+            <path d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v13h-1V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0l-.51-.51L2 2.118V15H1V2a.5.5 0 0 1 .059-.237l.5-1a.5.5 0 0 1 .361-.257zM5 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 3a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1H5z" />
+          </svg>
 
-            <div className="d-flex justify-content-between align-items-start">
-
-              <div>
-
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: TEXT_MUTED,
-                    fontWeight: 500
-                  }}
-                >
-                  {card.title}
-                </div>
-
-                <div
-                  className="fw-semibold mt-1"
-                  style={{
-                    fontSize: "26px",
-                    color: TEXT_MAIN
-                  }}
-                >
-                  {card.value}
-                </div>
-
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: TEXT_MUTED,
-                    marginTop: "4px"
-                  }}
-                >
-                  {card.subtitle}
-                </div>
-
-              </div>
-
-              <div style={{ color: PRIMARY, opacity: 0.7 }}>
-                <i className={`bi ${card.icon}`} style={{ fontSize: "20px" }} />
-              </div>
-
+          <div>
+            <div
+              style={{
+                fontSize: "11px",
+                color: "#280D5F",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                textTransform: "uppercase"
+              }}
+            >
+              TOTAL SPENT
             </div>
 
-            {card.showButton && (
-              <div className="mt-3">
-                <button
-                  className="btn w-100 rounded-pill purple-btn"
+            <div
+              className="fw-bold mt-1"
+              style={{
+                fontSize: "32px",
+                color: "#280D5F",
+                fontWeight: "900",
+                letterSpacing: "-0.8px",
+                lineHeight: "1.1"
+              }}
+            >
+              {formatMoney(totalSpent)}
+            </div>
+
+            <div
+              className="d-flex align-items-center"
+              style={{
+                fontSize: "12px",
+                color: "#4B2896",
+                marginTop: "6px",
+                fontWeight: 600
+              }}
+            >
+              <i className="bi bi-arrow-up-right me-1" style={{ fontSize: "13px", fontWeight: "bold" }}></i>
+              <span>12% from last week</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CARD 2: YOU ARE OWED (Dark background) */}
+      <div className="col-xl-4 col-md-6 col-sm-12">
+        <div
+          className="position-relative overflow-hidden themed-dark-card"
+          style={{
+            background: "#1B1B1D",
+            border: "1px solid #28282B",
+            padding: "18px 22px",
+            minHeight: "120px",
+            borderRadius: "20px"
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: "11px",
+                color: "#8A8A93",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                textTransform: "uppercase"
+              }}
+            >
+              YOU ARE OWED
+            </div>
+
+            <div
+              className="fw-bold mt-1"
+              style={{
+                fontSize: "32px",
+                color: "#DFD6FF",
+                fontWeight: "900",
+                letterSpacing: "-0.8px",
+                lineHeight: "1.1"
+              }}
+            >
+              {formatMoney(Math.max(userIsOwed, 0))}
+            </div>
+
+            {/* Avatars at the bottom left */}
+            <div className="d-flex align-items-center mt-2">
+              {visibleMembers.map((email, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
                   style={{
-                    background: PRIMARY,
-                    color: "white",
-                    fontWeight: 600,
-                    fontSize: "13px"
+                    width: "24px",
+                    height: "24px",
+                    fontSize: "9px",
+                    marginLeft: idx === 0 ? 0 : "-5px",
+                    background: "#9D5CFF",
+                    border: "2px solid #1B1B1D"
                   }}
-                  onClick={onSettle}
                 >
-                  Settle Up
-                </button>
-              </div>
-            )}
+                  {email[0].toUpperCase()}
+                </div>
+              ))}
+              {extraMembers > 0 && (
+                <div
+                  className="rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                  style={{
+                    width: "24px",
+                    height: "24px",
+                    fontSize: "9px",
+                    marginLeft: "-5px",
+                    background: "#39393B",
+                    color: "#A1A1AA",
+                    border: "2px solid #1B1B1D"
+                  }}
+                >
+                  +{extraMembers}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CARD 3: PENDING SETTLE-UPS (Yellow background) */}
+      <div className="col-xl-4 col-md-6 col-sm-12">
+        <div
+          className="position-relative overflow-hidden yellow-card"
+          style={{
+            background: "#FFD02F",
+            cursor: balances.length > 0 ? "pointer" : "default",
+            padding: "18px 22px",
+            minHeight: "120px",
+            borderRadius: "20px"
+          }}
+          onClick={() => {
+            if (balances.length > 0) {
+              onSettle?.();
+            }
+          }}
+        >
+          {/* Background SVG Warning Exclamation icon */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="80"
+            height="80"
+            fill="rgba(77, 58, 0, 0.08)"
+            className="bi fill-current"
+            viewBox="0 0 24 24"
+            style={{
+              position: "absolute",
+              right: "-5px",
+              bottom: "-10px",
+              pointerEvents: "none"
+            }}
+          >
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+          </svg>
+
+          <div>
+            <div
+              style={{
+                fontSize: "11px",
+                color: "#4D3A00",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                textTransform: "uppercase"
+              }}
+            >
+              PENDING SETTLE-UPS
+            </div>
+
+            <div
+              className="fw-bold mt-1"
+              style={{
+                fontSize: "32px",
+                color: "#1E1600",
+                fontWeight: "900",
+                letterSpacing: "-0.8px",
+                lineHeight: "1.1"
+              }}
+            >
+              {balances.length}
+            </div>
+
+            <div
+              className="d-flex align-items-center"
+              style={{
+                fontSize: "12px",
+                color: "#4D3A00",
+                marginTop: "10px",
+                fontWeight: 600
+              }}
+            >
+              {balances.length > 0 ? (
+                <>
+                  <span>Review Requests</span>
+                  <i className="bi bi-arrow-right ms-1" style={{ fontSize: "11px" }}></i>
+                </>
+              ) : (
+                "All Settled"
+              )}
+            </div>
 
           </div>
-
         </div>
-
-      ))}
+      </div>
 
       <style>
         {`
-        .minimal-card:hover {
-          border-color: #E6E6EF;
-          transform: translateY(-2px);
+        .themed-dark-card {
+          transition: border-color 0.2s ease;
         }
-
-        .purple-btn:hover {
-          filter: brightness(1.08);
+        .themed-dark-card:hover {
+          border-color: #9D5CFF !important;
+        }
+        .purple-card {
+          transition: filter 0.2s ease;
+        }
+        .purple-card:hover {
+          filter: brightness(1.04);
+        }
+        .yellow-card {
+          transition: filter 0.2s ease;
+        }
+        .yellow-card:hover {
+          filter: brightness(1.04);
         }
         `}
       </style>

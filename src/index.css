@@ -8,6 +8,11 @@
 
 body {
   font-family: 'Manrope', sans-serif;
+  background-color: #F5F7FB !important;
+}
+
+.bg-light {
+  background-color: #F5F7FB !important;
 }
 
 .smooth-btn {
@@ -64,3 +69,319 @@ body {
   background: #F1EFFF;
 }
 
+/* ================= DARK MODE OVERRIDES ================= */
+body {
+  font-family: 'Manrope', sans-serif;
+  background-color: #131315 !important; /* Deep Obsidian */
+  color: #FFFFFF !important;
+}
+
+.bg-light {
+  background-color: #131315 !important;
+}
+
+/* Base text color overrides */
+h1, h2, h3, h4, h5, h6,
+.text-dark, .fw-semibold, .fw-medium, .fw-bold,
+.card-title, .h6 {
+  color: #FFFFFF !important;
+}
+
+.text-muted, small, .small {
+  color: #A1A1AA !important; /* Secondary Text */
+}
+
+/* Cards & containers background overrides */
+.bg-white,
+nav,
+.dropdown-menu,
+.modal-content {
+  background-color: #1B1B1D !important; /* Surface Low */
+  color: #FFFFFF !important;
+  border: 1px solid #39393B !important; /* Surface Bright */
+  box-shadow: none !important;
+}
+
+.card {
+  background-color: #1B1B1D !important; /* Surface Low */
+  color: #FFFFFF !important;
+  border: 1px solid #28282B !important; /* Subtle dark border */
+  box-shadow: none !important;
+}
+
+.card-body,
+.card-header,
+.card-footer,
+.modal-header,
+.modal-footer {
+  color: #FFFFFF !important;
+  border-color: #39393B !important;
+}
+
+/* Specific elements containing inline backgrounds */
+div[style*="background: white"],
+div[style*="background: rgb(255, 255, 255)"],
+div[style*="background: #FFFFFF"],
+div[style*="background: #white"],
+div[style*="background-color: #FFFFFF"],
+div[style*="background-color: white"] {
+  background-color: #1B1B1D !important;
+  border-color: #39393B !important;
+}
+
+/* Border overrides */
+div[style*="border: 1px solid #ECECF2"],
+div[style*="border: 1px solid #E6E7EC"],
+div[style*="border: 1px solid #ECECF2"],
+div[style*="border: 1px solid #ECECF2"],
+div[style*="border-bottom: 1px solid #ECECF2"],
+div[style*="border-bottom: 1px solid #E6E7EC"],
+div[style*="border: 1px solid #ECECF2"] {
+  border-color: #39393B !important;
+}
+
+/* Forms and Inputs */
+.form-control, select, .form-select {
+  background-color: #131315 !important; /* Deep Obsidian */
+  color: #FFFFFF !important;
+  border: 1px solid #39393B !important; /* Surface Bright */
+}
+
+.form-control:focus, select:focus, .form-select:focus {
+  background-color: #131315 !important;
+  color: #FFFFFF !important;
+  border-color: #9D5CFF !important; /* Vibrant Purple */
+  box-shadow: 0 0 0 0.2rem rgba(157, 92, 255, 0.25) !important;
+}
+
+/* Dropdown items */
+.dropdown-item {
+  color: #FFFFFF !important;
+}
+
+.dropdown-item:hover {
+  background-color: #39393B !important;
+  color: #FFFFFF !important;
+}
+
+/* Table overrides */
+.table {
+  color: #FFFFFF !important;
+}
+
+.table thead, .table thead tr, .table thead th {
+  background-color: #1B1B1D !important;
+  color: #FFFFFF !important;
+  border-bottom: 2px solid #39393B !important;
+}
+
+.table tr:hover {
+  background-color: #39393B !important;
+}
+
+.table td, .table th {
+  border-bottom: 1px solid #39393B !important;
+  color: #FFFFFF !important;
+}
+
+/* Specific component visual enhancements in dark mode */
+.expense-card {
+  background-color: #1B1B1D !important;
+  border: 1px solid #39393B !important;
+}
+
+.expense-card:hover {
+  background-color: #39393B !important;
+  transform: translateY(-2px);
+}
+
+.minimal-card {
+  background-color: #1B1B1D !important;
+  border-color: #39393B !important;
+}
+
+.minimal-card:hover {
+  border-color: #9D5CFF !important;
+}
+
+/* Category card spender styles */
+.category-card {
+  background-color: #1B1B1D !important;
+  border-color: #39393B !important;
+}
+
+/* Alert styling overrides */
+.alert-success {
+  background-color: #022C22 !important;
+  color: #6EE7B7 !important;
+  border-color: #047857 !important;
+}
+
+.alert-danger {
+  background-color: #450A0A !important;
+  color: #FCA5A5 !important;
+  border-color: #B91C1C !important;
+}
+
+/* Brand Purple & Yellow accents conversions */
+.btn-primary,
+button[style*="background: #7C6CF2"],
+button[style*="background-color: #7C6CF2"],
+button[style*="background: rgb(124, 108, 242)"] {
+  background-color: #FFD700 !important; /* Action Yellow */
+  color: #131315 !important; /* Deep Obsidian text */
+  border-color: #FFD700 !important;
+  font-weight: 600 !important;
+}
+
+button[style*="background: #7C6CF2"]:hover,
+button[style*="background-color: #7C6CF2"]:hover,
+.btn-primary:hover {
+  filter: brightness(1.1) !important;
+}
+
+/* Brand Violet text converts to Brand Purple */
+span[style*="color: #7C6CF2"],
+div[style*="color: #7C6CF2"],
+button[style*="color: #7C6CF2"],
+i[style*="color: #7C6CF2"],
+a[style*="color: #7C6CF2"] {
+  color: #9D5CFF !important;
+}
+
+/* Brand Soft Violet Background converts to brand purple transparent overlay */
+span[style*="background: #F1EFFF"],
+span[style*="background-color: #F1EFFF"],
+div[style*="background: #F1EFFF"],
+div[style*="background-color: #F1EFFF"],
+button[style*="background: #F1EFFF"],
+button[style*="background-color: #F1EFFF"] {
+  background-color: rgba(157, 92, 255, 0.15) !important;
+  color: #9D5CFF !important;
+}
+
+/* User header specific overrides */
+.user-header-nav {
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  transition: left 0.25s, width 0.25s, background-color 0.25s, border-color 0.25s, box-shadow 0.25s !important;
+}
+
+.user-header-nav.scrolled {
+  background-color: rgba(27, 27, 29, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  border: none !important;
+  border-bottom: 1px solid #39393B !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15) !important;
+  border-radius: 0 !important;
+}
+
+
+/* ================= MATERIAL FLOATING LABEL INPUTS ================= */
+.mat-field {
+  position: relative;
+  margin-bottom: 28px;
+}
+
+/* Grey static underline via ::before */
+.mat-field::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background: #39393B;
+  pointer-events: none;
+}
+
+/* Purple animated overlay via ::after */
+.mat-field::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #9D5CFF;
+  transition: width 0.25s ease;
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+.mat-field:focus-within::after {
+  width: 100%;
+}
+
+.mat-field input,
+.mat-field textarea,
+.mat-field select {
+  width: 100%;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  color: #FFFFFF !important;
+  font-size: 15px;
+  padding: 18px 0 8px 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  /* No transition on background — prevents white flash */
+  transition: color 0.15s ease;
+  font-family: 'Manrope', sans-serif;
+}
+
+.mat-field textarea {
+  resize: none;
+  min-height: 70px;
+}
+
+.mat-field select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.mat-field input:focus,
+.mat-field textarea:focus,
+.mat-field select:focus {
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Kill autofill white background flash */
+.mat-field input:-webkit-autofill,
+.mat-field input:-webkit-autofill:hover,
+.mat-field input:-webkit-autofill:focus,
+.mat-field input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 60px #1B1B1D inset !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.mat-field label {
+  position: absolute;
+  top: 18px;
+  left: 0;
+  color: #5A5A62;
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: none;
+  transition: top 0.18s ease, font-size 0.18s ease, color 0.18s ease;
+  font-family: 'Manrope', sans-serif;
+}
+
+.mat-field input:focus ~ label,
+.mat-field input:not(:placeholder-shown) ~ label,
+.mat-field textarea:focus ~ label,
+.mat-field textarea:not(:placeholder-shown) ~ label,
+.mat-field select:focus ~ label,
+.mat-field.has-value label {
+  top: 0px;
+  font-size: 11px;
+  color: #9D5CFF;
+}
+
+.mat-field input::placeholder,
+.mat-field textarea::placeholder {
+  color: transparent;
+}

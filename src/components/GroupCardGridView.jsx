@@ -21,8 +21,8 @@ function GroupCardGridView({
             <div
                 className="card border-0 rounded-4 overflow-hidden h-100"
                 style={{
-                    background: "#FFFFFF",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                    background: "#1B1B1D",
+                    boxShadow: "none",
                     cursor: "pointer"
                 }}
                 onClick={handleRedirection}
@@ -43,7 +43,7 @@ function GroupCardGridView({
                         className="position-absolute top-0 start-0 w-100 h-100"
                         style={{
                             background:
-                                "linear-gradient(to top, rgba(124,108,242,0.35), rgba(0,0,0,0.2))"
+                                "linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.08))"
                         }}
                     />
 
@@ -94,7 +94,7 @@ function GroupCardGridView({
                 <div className="card-body d-flex flex-column justify-content-between">
 
                     {group.description && (
-                        <p className="small mb-3" style={{ color: "#6B7280" }}>
+                        <p className="small mb-3" style={{ color: "#A1A1AA" }}>
                             {group.description}
                         </p>
                     )}
@@ -114,8 +114,8 @@ function GroupCardGridView({
                                         height: "32px",
                                         fontSize: "12px",
                                         marginLeft: "-8px",
-                                        background: "#FFF6D6",
-                                        color: "#8A6B00"
+                                        background: "rgba(255, 215, 0, 0.15)",
+                                        color: "#FFD700"
                                     }}
                                 >
                                     +{extraMembers}
@@ -123,7 +123,7 @@ function GroupCardGridView({
                             )}
                         </div>
 
-                        <small style={{ color: "#6B7280" }}>
+                        <small style={{ color: "#A1A1AA" }}>
                             {members.length} members
                         </small>
 

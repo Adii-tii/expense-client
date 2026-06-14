@@ -69,7 +69,16 @@ function Register({ refreshAuth }) {
       navigate('/dashboard');
     } catch (error) {
       if (error.response) {
-        setErrors({ general: error.response.data.message });
+        const data = error.response.data;
+        if (data.errors && Array.isArray(data.errors)) {
+          const fieldErrors = {};
+          data.errors.forEach((err) => {
+            fieldErrors[err.path || err.param] = err.msg;
+          });
+          setErrors(fieldErrors);
+        } else {
+          setErrors({ general: data.message || "An error occurred during registration." });
+        }
       } else {
         setErrors({ general: "Network error. Please try again." });
       }

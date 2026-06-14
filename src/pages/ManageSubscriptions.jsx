@@ -145,7 +145,7 @@ function ManageSubscription() {
   /* ================= UI ================= */
 
   return (
-    <div className="container py-5" style={{ maxWidth: "900px" }}>
+    <div className="container-fluid px-0" style={{ maxWidth: "900px" }}>
 
       <h4 className="fw-semibold mb-4" style={{ color: TEXT_MAIN }}>
         Manage Subscription

@@ -60,9 +60,9 @@ function GroupCard({
         height: layout === "list" ? "28px" : "32px",
         fontSize: layout === "list" ? "11px" : "12px",
         marginLeft: index === 0 ? 0 : "-8px",
-        background: "#F1EFFF",
-        color: "#7C6CF2",
-        border: "2px solid white"
+        background: "rgba(157, 92, 255, 0.15)",
+        color: "#9D5CFF",
+        border: "2px solid #1B1B1D"
       }}
     >
       {email?.[0]?.toUpperCase()}

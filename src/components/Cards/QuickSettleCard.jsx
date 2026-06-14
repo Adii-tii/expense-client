@@ -1,113 +1,121 @@
-    import React from "react";
+import React from "react";
 
-    function QuickSettleCard({ debt, onSettle }) {
+function QuickSettleCard({ debt, onSettle }) {
+  if (!debt) return null;
 
-    if (!debt) return null;
+  /* ===== THEME ===== */
+  const PRIMARY = "#9D5CFF";
+  const PRIMARY_SOFT = "rgba(157, 92, 255, 0.15)";
+  const TEXT_MAIN = "#FFFFFF";
+  const TEXT_MUTED = "#A1A1AA";
+  const RED = "#EF4444";
 
-    /* ===== THEME ===== */
+  const getInitial = (email) => email?.[0]?.toUpperCase() || "?";
 
-    const PRIMARY = "#7C6CF2";
-    const PRIMARY_SOFT = "#F1EFFF";
-    const TEXT_MAIN = "#111827";
-    const TEXT_MUTED = "#6B7280";
-    const BORDER = "#E5E7EB";
-    const RED = "#DC2626";
+  return (
+    <div
+      style={{
+        background: "#1B1B1D",
+        border: "1px solid #28282B",
+        borderRadius: "16px",
+        padding: "10px 16px",
+        height: "70px",
+        display: "flex",
+        alignItems: "center",
+        transition: "all 0.2s ease",
+        cursor: "default"
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-2px)";
+        e.currentTarget.style.background = "#242427";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0px)";
+        e.currentTarget.style.background = "#1B1B1D";
+      }}
+    >
+      <div className="d-flex align-items-center justify-content-between w-100">
+        {/* LEFT SIDE: AVATAR AND TEXT */}
+        <div className="d-flex align-items-center gap-3">
+          {/* AVATAR */}
+          <div
+            style={{
+              width: "38px",
+              height: "38px",
+              borderRadius: "10px",
+              background: PRIMARY_SOFT,
+              color: PRIMARY,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: 700,
+              fontSize: "15px"
+            }}
+          >
+            {getInitial(debt.to)}
+          </div>
 
-    const getInitial = (email) =>
-        email?.[0]?.toUpperCase() || "?";
-
-    return (
-        <div
-        style={{
-            background: "#FFFFFF",
-            border: `1px solid ${BORDER}`,
-            borderRadius: "16px",
-            padding: "14px 16px"
-        }}
-        >
-
-        <div className="d-flex justify-content-between align-items-center">
-
-            {/* LEFT SIDE */}
-            <div className="d-flex align-items-center gap-3">
-
-            {/* AVATAR */}
+          {/* TEXT BLOCK */}
+          <div>
             <div
-                style={{
-                width: "42px",
-                height: "42px",
-                borderRadius: "50%",
-                background: PRIMARY_SOFT,
-                color: PRIMARY,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 700
-                }}
-            >
-                {getInitial(debt.to)}
-            </div>
-
-            {/* TEXT BLOCK */}
-            <div>
-
-                {/* GROUP NAME */}
-                <div
-                style={{
-                    fontSize: "13px",
-                    color: TEXT_MUTED
-                }}
-                >
-                {debt.groupName}
-                </div>
-
-                {/* DEBT TEXT */}
-                <div
-                style={{
-                    fontSize: "14px",
-                    fontWeight: 600,
-                    color: TEXT_MAIN
-                }}
-                >
-                You owe {debt.to}
-                </div>
-
-            </div>
-
-            </div>
-
-            {/* RIGHT SIDE */}
-            <div className="text-end">
-
-            <div
-                style={{
-                fontSize: "15px",
+              style={{
+                fontSize: "14px",
                 fontWeight: 600,
-                color: RED
-                }}
+                color: TEXT_MAIN
+              }}
             >
-                ₹{Number(debt.amount || 0).toFixed(2)}
+              You owe {debt.to.split("@")[0]}
             </div>
-
-            <button
-                className="btn btn-sm mt-1"
-                style={{
-                background: PRIMARY,
-                color: "white",
-                borderRadius: "999px",
-                padding: "4px 14px"
-                }}
-                onClick={() => onSettle?.(debt)}
+            <div
+              style={{
+                fontSize: "11px",
+                color: TEXT_MUTED,
+                marginTop: "0px"
+              }}
             >
-                Settle
-            </button>
-
+              {debt.groupName}
             </div>
-
+          </div>
         </div>
 
-        </div>
-    );
-    }
+        {/* RIGHT SIDE: AMOUNT AND BUTTON */}
+        <div className="d-flex align-items-center gap-3">
+          <div
+            style={{
+              fontSize: "14px",
+              fontWeight: 800,
+              color: RED
+            }}
+          >
+            ₹{Number(debt.amount || 0).toFixed(2)}
+          </div>
 
-    export default QuickSettleCard;
+          <button
+            className="btn d-flex align-items-center justify-content-center fw-bold"
+            style={{
+              height: "28px",
+              borderRadius: "14px",
+              background: "#FFD700",
+              color: "#131315",
+              border: "none",
+              padding: "0 12px",
+              fontSize: "12px",
+              transition: "all 0.2s ease"
+            }}
+            onClick={() => onSettle?.(debt)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.filter = "brightness(1.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.filter = "none";
+            }}
+          >
+            Settle
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default QuickSettleCard;

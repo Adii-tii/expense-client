@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { serverEndpoint } from "../../config/appConfig";
 import axios from "axios";
+import colors from "../../theme/colors";
 
 function AddUsersModal({ users, setUsers, isOpen, setIsOpen, setMode, mode, editUser }) {
     const [actionLoading, setActionLoading] = useState(false);
@@ -126,19 +127,20 @@ function AddUsersModal({ users, setUsers, isOpen, setIsOpen, setMode, mode, edit
       <div
         className="modal-content border-0 rounded-4"
         style={{
-          background: "#FFFFFF",
-          boxShadow: "0 18px 40px rgba(0,0,0,0.15)"
+          background: "#1B1B1D",
+          boxShadow: "none",
+          border: "1px solid #39393B"
         }}
       >
 
         {/* HEADER */}
         <div
           className="modal-header border-bottom"
-          style={{ borderColor: "#E6E7EC" }}
+          style={{ borderColor: "#39393B" }}
         >
           <h5
             className="modal-title fw-semibold"
-            style={{ color: "#2B2D42" }}
+            style={{ color: "#FFFFFF" }}
           >
             {mode === "create" ? "Add Member" : "Edit Details"}
           </h5>
@@ -154,9 +156,9 @@ function AddUsersModal({ users, setUsers, isOpen, setIsOpen, setMode, mode, edit
 
           <form onSubmit={handleSubmit}>
 
-            {/* Username */}
+             {/* Username */}
             <div className="mb-3">
-              <label className="form-label fw-medium" style={{ color: "#2B2D42" }}>
+              <label className="form-label fw-medium" style={{ color: "#A1A1AA" }}>
                 Username
               </label>
 
@@ -168,10 +170,10 @@ function AddUsersModal({ users, setUsers, isOpen, setIsOpen, setMode, mode, edit
                 onChange={handleChange}
                 style={{
                   borderRadius: "10px",
-                  border: "1px solid #E6E7EC"
+                  border: "1px solid #39393B"
                 }}
-                onFocus={(e)=> e.target.style.border="1px solid #7C6CF2"}
-                onBlur={(e)=> e.target.style.border="1px solid #E6E7EC"}
+                onFocus={(e)=> e.target.style.border=`1px solid ${colors.PRIMARY}`}
+                onBlur={(e)=> e.target.style.border="1px solid #39393B"}
               />
 
               {errors.username && (
@@ -181,7 +183,7 @@ function AddUsersModal({ users, setUsers, isOpen, setIsOpen, setMode, mode, edit
 
             {/* Email */}
             <div className="mb-3">
-              <label className="form-label fw-medium" style={{ color: "#2B2D42" }}>
+              <label className="form-label fw-medium" style={{ color: "#A1A1AA" }}>
                 Email
               </label>
 
@@ -193,10 +195,10 @@ function AddUsersModal({ users, setUsers, isOpen, setIsOpen, setMode, mode, edit
                 onChange={handleChange}
                 style={{
                   borderRadius: "10px",
-                  border: "1px solid #E6E7EC"
+                  border: "1px solid #39393B"
                 }}
-                onFocus={(e)=> e.target.style.border="1px solid #7C6CF2"}
-                onBlur={(e)=> e.target.style.border="1px solid #E6E7EC"}
+                onFocus={(e)=> e.target.style.border=`1px solid ${colors.PRIMARY}`}
+                onBlur={(e)=> e.target.style.border="1px solid #39393B"}
               />
 
               {errors.email && (
@@ -206,7 +208,7 @@ function AddUsersModal({ users, setUsers, isOpen, setIsOpen, setMode, mode, edit
 
             {/* Role */}
             <div className="mb-4">
-              <label className="form-label fw-medium" style={{ color: "#2B2D42" }}>
+              <label className="form-label fw-medium" style={{ color: "#A1A1AA" }}>
                 Role
               </label>
 
@@ -217,10 +219,10 @@ function AddUsersModal({ users, setUsers, isOpen, setIsOpen, setMode, mode, edit
                 onChange={handleChange}
                 style={{
                   borderRadius: "10px",
-                  border: "1px solid #E6E7EC"
+                  border: "1px solid #39393B"
                 }}
-                onFocus={(e)=> e.target.style.border="1px solid #7C6CF2"}
-                onBlur={(e)=> e.target.style.border="1px solid #E6E7EC"}
+                onFocus={(e)=> e.target.style.border=`1px solid ${colors.PRIMARY}`}
+                onBlur={(e)=> e.target.style.border="1px solid #39393B"}
               >
                 <option value="Select">Select</option>
                 <option value="manager">Manager</option>
@@ -238,12 +240,13 @@ function AddUsersModal({ users, setUsers, isOpen, setIsOpen, setMode, mode, edit
               <button
                 className="btn rounded-pill py-2"
                 style={{
-                  background: "#7C6CF2",
-                  color: "white",
+                  background: colors.WARNING,
+                  color: "#131315",
+                  fontWeight: 600,
                   transition: "0.2s"
                 }}
-                onMouseEnter={(e)=> e.target.style.background="#6A5AE0"}
-                onMouseLeave={(e)=> e.target.style.background="#7C6CF2"}
+                onMouseEnter={(e)=> e.target.style.filter="brightness(1.1)"}
+                onMouseLeave={(e)=> e.target.style.filter="none"}
               >
                 {actionLoading ? (
                   <span className="spinner-border spinner-border-sm" />

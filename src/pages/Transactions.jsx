@@ -83,7 +83,7 @@ function Transactions() {
 
 
   return (
-    <div className="container py-4 mt-4">
+    <div className="container-fluid px-0">
 
     
 

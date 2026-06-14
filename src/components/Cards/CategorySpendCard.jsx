@@ -14,13 +14,13 @@ const CATEGORY_ICONS = {
 
 /* Optional accent colors per category */
 const CATEGORY_COLORS = {
-    Food: "#F59E0B",
-    Travel: "#0EA5E9",
-    Shopping: "#EC4899",
-    Bills: "#6366F1",
-    Entertainment: "#8B5CF6",
-    Health: "#EF4444",
-    Other: "#6B7280"
+    Food: "#FFD700",          // Vibrant Gold Yellow
+    Travel: "#9D5CFF",        // Brand Purple
+    Shopping: "#DFD6FF",      // Soft Lavender/Violet
+    Bills: "#7C6CF2",         // Deep Indigo Purple
+    Entertainment: "#FFB300", // Warm Amber Yellow
+    Health: "#C084FC",        // Medium Orchid Purple
+    Other: "#FDE047"          // Light Bright Yellow
 };
 
 function CategorySpendCard({ categoryData, onClick }) {
@@ -29,11 +29,11 @@ function CategorySpendCard({ categoryData, onClick }) {
 
     if (!categoryData) return null;
 
-    const PRIMARY = "#7C6CF2";
-    const PRIMARY_SOFT = "#F1EFFF";
-    const TEXT_MAIN = "#111827";
-    const TEXT_MUTED = "#6B7280";
-    const BORDER = "#E5E7EB";
+    const PRIMARY = "#9D5CFF";
+    const PRIMARY_SOFT = "rgba(157, 92, 255, 0.15)";
+    const TEXT_MAIN = "#FFFFFF";
+    const TEXT_MUTED = "#A1A1AA";
+    const BORDER = "#28282B";
 
     const { category, totalAmount, expenses } = categoryData;
 
@@ -46,6 +46,7 @@ function CategorySpendCard({ categoryData, onClick }) {
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
             style={{
+                background: "#1B1B1D",
                 border: `1px solid ${BORDER}`,
                 borderBottomRightRadius: "15px",
                 borderTopRightRadius: "15px",
@@ -53,9 +54,7 @@ function CategorySpendCard({ categoryData, onClick }) {
                 cursor: "pointer",
                 transition: "all 0.18s ease",
                 transform: hover ? "translateY(-3px)" : "translateY(0px)",
-                boxShadow: hover
-                    ? "0 6px 18px rgba(0,0,0,0.08)"
-                    : "0 2px 6px rgba(0,0,0,0.04)",
+                boxShadow: "none",
                 position: "relative",
                 overflow: "hidden"
             }}

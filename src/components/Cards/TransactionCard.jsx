@@ -18,14 +18,14 @@ function TransactionCard({ settlement }) {
   const isSender = fromEmail === user.email;
   const isReceiver = toEmail === user.email;
 
-  const PRIMARY = "#7C6CF2";
-  const PRIMARY_SOFT = "#F1EFFF";
-  const TEXT_MAIN = "#111827";
-  const TEXT_MUTED = "#6B7280";
-  const BORDER = "#E5E7EB";
+  const PRIMARY = "#9D5CFF";
+  const PRIMARY_SOFT = "rgba(157, 92, 255, 0.15)";
+  const TEXT_MAIN = "#FFFFFF";
+  const TEXT_MUTED = "#A1A1AA";
+  const BORDER = "#28282B";
 
-  const GREEN = "#16A34A";
-  const RED = "#DC2626";
+  const GREEN = "#10B981";
+  const YELLOW = "#FFD02F";
 
   const directionIcon = isSender
     ? "bi-arrow-up-right"
@@ -33,7 +33,7 @@ function TransactionCard({ settlement }) {
       ? "bi-arrow-down-right"
       : "bi-arrow-left-right";
 
-  const iconColor = isSender ? RED : isReceiver ? GREEN : PRIMARY;
+  const iconColor = isSender ? YELLOW : isReceiver ? GREEN : PRIMARY;
 
 
   const dateObj = new Date(settlement.createdAt);
@@ -51,22 +51,22 @@ function TransactionCard({ settlement }) {
   const getInitial = (email) =>
     email?.[0]?.toUpperCase() || "?";
 
-  const amountColor = isSender ? RED : isReceiver ? GREEN : TEXT_MAIN;
+  const amountColor = isSender ? YELLOW : isReceiver ? GREEN : TEXT_MAIN;
 
   const directionText = isSender
-    ? <>You <span className="text-danger">paid</span> {toEmail} ₹{settlement.amount}</>
+    ? <>You <span style={{ color: YELLOW }}>paid</span> {toEmail} ₹{settlement.amount}</>
     : isReceiver
-      ? <>You <span className="text-success">received</span> ₹{settlement.amount} from {fromEmail}</>
+      ? <>You <span style={{ color: GREEN }}>received</span> ₹{settlement.amount} from {fromEmail}</>
       : "Settlement";
 
 
   return (
     <div
       style={{
-        background: "#FFFFFF",
-        border: `1px solid ${BORDER}`,
-        borderRadius: "16px",
-        padding: "16px 18px",
+        background: "#1B1B1D",
+        border: "none",
+        borderRadius: "12px",
+        padding: "8px 12px",
         transition: "0.18s",
       }}
     >
@@ -78,9 +78,9 @@ function TransactionCard({ settlement }) {
           {/* ICON */}
           <div
             style={{
-              width: 50,
-              height: 50,
-              borderRadius: 10,
+              width: 38,
+              height: 38,
+              borderRadius: 8,
               background: PRIMARY_SOFT,
               display: "flex",
               alignItems: "center",
@@ -90,7 +90,7 @@ function TransactionCard({ settlement }) {
           >
             <i
               className={`bi ${directionIcon}`}
-              style={{ color: iconColor, fontSize: 16 }}
+              style={{ color: iconColor, fontSize: 14 }}
             />
           </div>
 
@@ -133,7 +133,7 @@ function TransactionCard({ settlement }) {
                 marginTop: 6
               }}
             >
-              {date} • {time}
+              {date}
             </div>
 
           </div>
@@ -151,8 +151,8 @@ function TransactionCard({ settlement }) {
         >
           <div
             style={{
-              fontSize: 18,
-              fontWeight: 700,
+              fontSize: 15,
+              fontWeight: 500,
               color: amountColor
             }}
           >
@@ -161,9 +161,9 @@ function TransactionCard({ settlement }) {
 
           <div
             style={{
-              fontSize: 11,
-              color: TEXT_MUTED,
-              marginTop: 2
+              fontSize: 10,
+              color: YELLOW,
+              marginTop: 1
             }}
           >
             Settlement

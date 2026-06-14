@@ -26,10 +26,17 @@ function Login({ refreshAuth }) {
   };
 
   const hasPassword = async () => {
-
-    const res = await axios.post(`${serverEndpoint}/auth/valid-login`, { email: formData.email });
-    return res.data.hasPassword; //if true user has a password
-  }
+    try {
+      const res = await axios.post(`${serverEndpoint}/auth/valid-login`, { email: formData.email });
+      return res.data.hasPassword; //if true user has a password
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        // User not found, let it proceed to standard login endpoint for standard error response
+        return true;
+      }
+      throw error;
+    }
+  };
 
   const validate = async () => {
     let newErrors = {};
@@ -63,13 +70,10 @@ function Login({ refreshAuth }) {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
-    console.log("here");
-    const isValid = await validate();
-
-    if (!isValid) return;
-    console.log("passed validation")
-
     try {
+      const isValid = await validate();
+      if (!isValid) return;
+
       const body = {
         email: formData.email,
         password: formData.password
@@ -83,12 +87,19 @@ function Login({ refreshAuth }) {
 
     } catch (error) {
       if (error.response) {
-        setErrors({ general: error.response.data.message });
+        const data = error.response.data;
+        if (data.errors && Array.isArray(data.errors)) {
+          const fieldErrors = {};
+          data.errors.forEach((err) => {
+            fieldErrors[err.path || err.param] = err.msg;
+          });
+          setErrors(fieldErrors);
+        } else {
+          setErrors({ general: data.message || "An error occurred during login." });
+        }
       } else {
         setErrors({ general: "Network error. Please try again." });
       }
-    } finally {
-      console.log(isValid);
     }
   };
 

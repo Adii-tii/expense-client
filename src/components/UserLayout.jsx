@@ -1,16 +1,14 @@
 import { useState } from "react";
 import Sidebar from "./Sidebar";
-import UserHeader from "./userHeader";
+import UserHeader from "./UserHeader";
 
 function UserLayout({ children }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  
-  const sidebarWidth = sidebarCollapsed ? 45 : 195;
-  const headerHeight = 33; // Height of the header in pixels
+  const sidebarWidth = sidebarCollapsed ? 70 : 220;
 
   return (
-    <div className="bg-light">
+    <div className="min-vh-100">
       <Sidebar
         collapsed={sidebarCollapsed}
         setCollapsed={setSidebarCollapsed}
@@ -21,11 +19,14 @@ function UserLayout({ children }) {
       {/* Main content */}
       <main
         style={{
-          marginLeft: sidebarWidth,
-          marginTop: headerHeight,
+          marginLeft: `${sidebarWidth}px`,
+          paddingTop: "72px", // topbar height (56px) + gap (16px) = 72px
+          paddingLeft: "24px",
+          paddingRight: "24px",
+          paddingBottom: "24px",
           transition: "margin-left 0.25s",
         }}
-        className="bg-light min-vh-100 p-4"
+        className="min-vh-100"
       >
         {children}
       </main>

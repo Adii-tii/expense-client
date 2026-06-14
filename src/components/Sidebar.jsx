@@ -20,21 +20,26 @@ function Sidebar({ collapsed, setCollapsed }) {
 
   return (
     <div
-      className="position-fixed top-0 start-0 d-flex flex-column"
+      className="position-fixed d-flex flex-column"
       style={{
+        top: "0",
+        left: "0",
+        bottom: "0",
         width,
         height: "100vh",
-        background: "#FFFFFF",
-        borderRight: "1px solid #E6E7EC",
-        transition: "width 0.25s",
-        zIndex: 1000
+        background: "#131315",
+        border: "none",
+        borderRight: "1px solid #1E1E20",
+        boxShadow: "none",
+        transition: "width 0.25s, left 0.25s",
+        zIndex: 1040
       }}
     >
 
       {/* ===== HEADER ===== */}
-      <div className="px-3 py-2  border-bottom d-flex align-items-center justify-content-between" style={{height: "55px" }}>
+      <div className="px-3 py-2 d-flex align-items-center justify-content-between" style={{ height: "55px", borderBottom: "1px solid #1E1E20" }}>
         {!collapsed && (
-          <span className="fw-semibold" style={{ color: "#2B2D42"}}>
+          <span className="fw-bold" style={{ color: "#FFFFFF", fontSize: "16px", letterSpacing: "-0.3px" }}>
             Expense
           </span>
         )}
@@ -43,13 +48,22 @@ function Sidebar({ collapsed, setCollapsed }) {
           onClick={() => setCollapsed(!collapsed)}
           className="d-flex align-items-center justify-content-center"
           style={{
-            width: "34px",
-            borderRadius: "50%",
+            width: "32px", height: "32px",
+            borderRadius: "8px",
             cursor: "pointer",
-            color: "#5F6368"
+            color: "#4A4A52",
+            transition: "color 0.15s, background 0.15s"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "#FFFFFF";
+            e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "#4A4A52";
+            e.currentTarget.style.background = "transparent";
           }}
         >
-          <i className={`bi ${collapsed ? "bi-list" : "bi-layout-sidebar"}`} />
+          <i className={`bi ${collapsed ? "bi-list" : "bi-layout-sidebar"}`} style={{ fontSize: "16px" }} />
         </div>
       </div>
 
@@ -63,44 +77,48 @@ function Sidebar({ collapsed, setCollapsed }) {
               <button
                 className="w-100 d-flex align-items-center border-0 bg-transparent position-relative"
                 style={{
-                  padding: "8px",
-                  borderRadius: collapsed ? "999px" : "12px",
-                  background: isActive ? "#F1EFFF" : "transparent",
-                  transition: "all 0.2s ease"
+                  padding: collapsed ? "10px" : "10px 12px",
+                  borderRadius: "10px",
+                  background: isActive ? "rgba(157, 92, 255, 0.10)" : "transparent",
+                  color: isActive ? "#9D5CFF" : "#5A5A62",
+                  transition: "all 0.15s ease",
+                  gap: "12px",
+                  justifyContent: collapsed ? "center" : "flex-start"
                 }}
                 onClick={() => navigate(`/${key}`)}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
+                    e.currentTarget.style.color = "#A1A1AA";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.color = "#5A5A62";
+                  }
+                }}
               >
-
-                {!collapsed && isActive && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: "-6px",
-                      height: "60%",
-                      width: "4px",
-                      borderRadius: "4px",
-                      background: "#7C6CF2"
-                    }}
-                  />
+                {/* Active indicator bar */}
+                {isActive && (
+                  <div style={{
+                    position: "absolute",
+                    left: "-8px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: "3px",
+                    height: "20px",
+                    borderRadius: "0 2px 2px 0",
+                    background: "#9D5CFF"
+                  }} />
                 )}
 
-                <div
-                  className="d-flex align-items-center justify-content-center"
-                  style={{
-                    width: "38px",
-                    height: "38px",
-                    borderRadius: "999px",
-                    background: collapsed && isActive ? "#F1EFFF" : "transparent",
-                    color: isActive ? "#7C6CF2" : "#353839"
-                  }}
-                >
-                  <i className={`bi ${icon}`} />
-                </div>
+                <i className={`bi ${icon}`} style={{ fontSize: "17px" }} />
 
                 {!collapsed && (
                   <span
-                    className="ms-2 fw-medium"
-                    style={{ color: isActive ? "#7C6CF2" : "#2B2D42" }}
+                    className="fw-medium"
+                    style={{ fontSize: "14px" }}
                   >
                     {label}
                   </span>
@@ -110,56 +128,72 @@ function Sidebar({ collapsed, setCollapsed }) {
           );
         })}
 
-        <hr className="my-3" />
+        <hr className="my-3" style={{ borderColor: "#1E1E20", opacity: 1 }} />
 
         {/* ===== SETTINGS ===== */}
         <li className="nav-item">
           <button
-            className="w-100 d-flex align-items-center border-0 bg-transparent"
+            className="w-100 d-flex align-items-center border-0 bg-transparent position-relative"
             style={{
-              padding: "8px",
-              borderRadius: collapsed ? "999px" : "12px",
-              background: active === "settings" ? "#F1EFFF" : "transparent"
+              padding: collapsed ? "10px" : "10px 12px",
+              borderRadius: "10px",
+              background: active === "settings" ? "rgba(157, 92, 255, 0.10)" : "transparent",
+              color: active === "settings" ? "#9D5CFF" : "#5A5A62",
+              transition: "all 0.15s ease",
+              gap: "12px",
+              justifyContent: collapsed ? "center" : "flex-start"
             }}
             onClick={() => navigate("/settings")}
+            onMouseEnter={(e) => {
+              if (active !== "settings") {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
+                e.currentTarget.style.color = "#A1A1AA";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (active !== "settings") {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.color = "#5A5A62";
+              }
+            }}
           >
-            <div
-              className="d-flex align-items-center justify-content-center"
-              style={{
-                width: "38px",
-                height: "38px",
-                borderRadius: "999px",
-                background:
-                  collapsed && active === "settings" ? "#F1EFFF" : "transparent",
-                color: active === "settings" ? "#7C6CF2" : "#353839"
-              }}
-            >
-              <i className="bi bi-gear" />
-            </div>
+            {active === "settings" && (
+              <div style={{
+                position: "absolute", left: "-8px", top: "50%",
+                transform: "translateY(-50%)", width: "3px", height: "20px",
+                borderRadius: "0 2px 2px 0", background: "#9D5CFF"
+              }} />
+            )}
+
+            <i className="bi bi-gear" style={{ fontSize: "17px" }} />
 
             {!collapsed && (
-              <span className="ms-2 fw-medium">Settings</span>
+              <span className="fw-medium" style={{ fontSize: "14px" }}>
+                Settings
+              </span>
             )}
           </button>
         </li>
       </ul>
 
       {/* ===== ACCOUNT ===== */}
-      <div className="border-top px-3 py-3 d-flex align-items-center">
+      <div className="px-3 py-3 d-flex align-items-center" style={{ borderTop: "1px solid #1E1E20", gap: "10px" }}>
         <div
-          className="rounded-circle d-flex align-items-center justify-content-center fw-semibold"
+          className="rounded-circle d-flex align-items-center justify-content-center fw-bold"
           style={{
-            width: "38px",
-            height: "38px",
-            background: "#F1EFFF",
-            color: "#7C6CF2"
+            width: "34px",
+            height: "34px",
+            background: "rgba(157, 92, 255, 0.12)",
+            color: "#9D5CFF",
+            fontSize: "13px",
+            flexShrink: 0
           }}
         >
           {user.username?.[0]?.toUpperCase() || "U"}
         </div>
 
         {!collapsed && (
-          <span className="ms-2 fw-medium">{user.username}</span>
+          <span className="fw-medium" style={{ color: "#FFFFFF", fontSize: "14px" }}>{user.username}</span>
         )}
       </div>
     </div>

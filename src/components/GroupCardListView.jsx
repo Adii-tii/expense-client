@@ -24,12 +24,12 @@ function GroupCardListView(
 
                 <div style={{ flex: 2 }}>
                     <div className="fw-semibold">{group.name}</div>
-                    <small style={{ color: "#6B7280" }}>
+                    <small style={{ color: "#A1A1AA" }}>
                         {group.description || "No description"}
                     </small>
                 </div>
 
-                <div style={{ flex: 1, color: "#7C6CF2", fontWeight: 500 }}>
+                <div style={{ flex: 1, color: "#9D5CFF", fontWeight: 500 }}>
                     {members.length} members
                 </div>
 
@@ -46,9 +46,9 @@ function GroupCardListView(
                                 height: "28px",
                                 fontSize: "11px",
                                 marginLeft: "-8px",
-                                background: "#FFF6D6",
-                                color: "#8A6B00",
-                                border: "2px solid white"
+                                background: "rgba(255, 215, 0, 0.15)",
+                                color: "#FFD700",
+                                border: "2px solid #1B1B1D"
                             }}
                         >
                             +{extraMembers}

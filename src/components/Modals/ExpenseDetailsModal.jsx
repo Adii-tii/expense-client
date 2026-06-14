@@ -8,11 +8,11 @@ function ExpenseDetailsModal({ expense, isOpen, onClose, onSettleExpense }) {
 
   /* ===== THEME ===== */
 
-  const PRIMARY = "#7C6CF2";
-  const PRIMARY_SOFT = "#F1EFFF";
-  const TEXT_MUTED = "#6B7280";
-  const BORDER = "#E6E7EC";
-  const BG_WHITE = "#FFFFFF";
+  const PRIMARY = "#9D5CFF";
+  const PRIMARY_SOFT = "rgba(157, 92, 255, 0.15)";
+  const TEXT_MUTED = "#A1A1AA";
+  const BORDER = "#39393B";
+  const BG_WHITE = "#1B1B1D";
 
   /* ===== HELPERS ===== */
 
@@ -160,8 +160,8 @@ function ExpenseDetailsModal({ expense, isOpen, onClose, onSettleExpense }) {
           {/* Settle Button appears ONLY if user owes */}
           {myBalance < 0 && (
             <button
-              className="btn text-white rounded-pill px-4"
-              style={{ background: PRIMARY }}
+              className="btn rounded-pill px-4"
+              style={{ background: "#FFD700", color: "#131315", fontWeight: 600 }}
               onClick={() => onSettleExpense?.(expense)}
             >
               Settle this expense
@@ -171,8 +171,8 @@ function ExpenseDetailsModal({ expense, isOpen, onClose, onSettleExpense }) {
           <button
             className="btn"
             style={{
-              background: PRIMARY_SOFT,
-              color: PRIMARY,
+              background: "#39393B",
+              color: "#FFFFFF",
               borderRadius: "999px"
             }}
             onClick={onClose}

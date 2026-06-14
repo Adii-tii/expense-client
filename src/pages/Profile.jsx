@@ -66,9 +66,8 @@ function Profile() {
   return (
     <div
       style={{
-        minHeight: "100vh",
-        background: theme.BG_LIGHT,
-        padding: "40px 32px"
+        background: "transparent",
+        padding: "0"
       }}
     >
       <div

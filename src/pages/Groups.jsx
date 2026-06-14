@@ -5,6 +5,7 @@ import { BeatLoader } from "react-spinners";
 import GroupCard from "../components/GroupCard";
 import CreateGroupModal from "../components/Modals/CreateGroupModal";
 import Can from "../components/Can";
+import { useLocation } from "react-router-dom";
 
 function Groups() {
   const [groups, setGroups] = useState([]);
@@ -54,6 +55,14 @@ function Groups() {
     setIsModalOpen(true);
   };
 
+  const location = useLocation();
+  useEffect(() => {
+    if (location.state?.openCreate) {
+      handleCreate();
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
@@ -74,24 +83,24 @@ function Groups() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#f8f9fa"
+          backgroundColor: "#131315"
         }}
       >
-        <BeatLoader color="black" size={15} />
+        <BeatLoader color="#9D5CFF" size={15} />
       </div>
     );
   }
 
   return (
-    <div className="container-fluid bg-light px-5 py-5">
+    <div className="container-fluid px-0">
 
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 mt-4 px-2">
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 mt-0 px-0">
 
         <div>
-          <h4 className="fw-semibold mb-1" style={{ color: "#2B2D42" }}>
+          <h4 className="fw-semibold mb-1" style={{ color: "#FFFFFF" }}>
             Your Groups
           </h4>
-          <small style={{ color: "#6B7280" }}>
+          <small style={{ color: "#A1A1AA" }}>
             Manage and track shared expenses
           </small>
         </div>
@@ -101,7 +110,7 @@ function Groups() {
           <div
             className="d-flex p-1"
             style={{
-              background: "#F3F4F8",
+              background: "#1B1B1D",
               borderRadius: "999px"
             }}
           >
@@ -114,10 +123,9 @@ function Groups() {
                   width: "36px",
                   height: "36px",
                   borderRadius: "999px",
-                  background: layout === type ? "#FFFFFF" : "transparent",
-                  color: layout === type ? "#7C6CF2" : "#6B7280",
-                  boxShadow:
-                    layout === type ? "0 2px 6px rgba(0,0,0,0.08)" : "none",
+                  background: layout === type ? "#9D5CFF" : "transparent",
+                  color: layout === type ? "#FFFFFF" : "#A1A1AA",
+                  boxShadow: "none",
                   transition: "all 0.2s ease"
                 }}
               >
@@ -128,7 +136,7 @@ function Groups() {
 
           <div
             style={{
-              background: "#F3F4F8",
+              background: "#1B1B1D",
               borderRadius: "999px",
               padding: "4px 12px"
             }}
@@ -143,7 +151,7 @@ function Groups() {
                 border: "none",
                 background: "transparent",
                 outline: "none",
-                color: "#2B2D42",
+                color: "#FFFFFF",
                 fontWeight: 500,
                 cursor: "pointer"
               }}
@@ -159,8 +167,9 @@ function Groups() {
             <button
               className="btn rounded-pill px-3 px-md-4"
               style={{
-                background: "#7C6CF2",
-                color: "white",
+                background: "#FFD700",
+                color: "#131315",
+                fontWeight: 600,
                 height: "44px",
                 whiteSpace: "nowrap"
               }}
@@ -177,7 +186,7 @@ function Groups() {
 
       {loading ? (
         <div className="d-flex justify-content-center py-5">
-          <BeatLoader color="#7C6CF2" />
+          <BeatLoader color="#9D5CFF" />
         </div>
 
       ) : groups.length === 0 ? (
@@ -187,8 +196,9 @@ function Groups() {
           <p className="text-muted mb-4">
             Create a group and start splitting expenses.
           </p>
-          <button type="submit" className="btn border-0 rounded-pill px-3 text-white mx-auto" style={{
-            background: "#7C6CF2",
+          <button type="submit" className="btn border-0 rounded-pill px-3 text-dark mx-auto" style={{
+            background: "#FFD700",
+            fontWeight: 600,
             width: "200px",
             height: "40px"
           }} onClick = {handleCreate}>
@@ -252,8 +262,8 @@ function Groups() {
                     height: "36px",
                     borderRadius: "10px",
                     border: "none",
-                    background: active ? "#7C6CF2" : "#F3F4F8",
-                    color: active ? "#FFFFFF" : "#2B2D42",
+                    background: active ? "#9D5CFF" : "#1B1B1D",
+                    color: active ? "#FFFFFF" : "#A1A1AA",
                     fontWeight: 600,
                     transition: "0.2s"
                   }}
@@ -266,10 +276,11 @@ function Groups() {
 
           <div
             style={{
-              background: "#F3F4F8",
+              background: "#1B1B1D",
               borderRadius: "999px",
               padding: "4px 14px",
-              fontWeight: 500
+              fontWeight: 500,
+              color: "#FFFFFF"
             }}
           >
             Show
@@ -282,7 +293,8 @@ function Groups() {
                 border: "none",
                 background: "transparent",
                 textAlign: "center",
-                outline: "none"
+                outline: "none",
+                color: "#FFFFFF"
               }}
             />
             of {groupCount}

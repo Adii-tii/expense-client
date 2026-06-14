@@ -1,30 +1,30 @@
 const theme = {
-  PRIMARY: "#7C6CF2",
-  PRIMARY_SOFT: "#F1EFFF",
-  PRIMARY_GLOW: "#E6E2FF",
+  PRIMARY: "#9D5CFF",
+  PRIMARY_SOFT: "rgba(157, 92, 255, 0.15)",
+  PRIMARY_GLOW: "rgba(157, 92, 255, 0.25)",
 
-  TEXT_MAIN: "#2B2D42",
-  TEXT_MUTED: "#6B7280",
+  TEXT_MAIN: "#FFFFFF",
+  TEXT_MUTED: "#A1A1AA",
 
-  BG_WHITE: "#FFFFFF",
-  BG_LIGHT: "#F9FAFB",
-  BG_SOFT: "#F3F4F8",
+  BG_WHITE: "#1B1B1D",
+  BG_LIGHT: "#131315",
+  BG_SOFT: "#1B1B1D",
 
-  BORDER: "#E6E7EC",
-  HOVER_GREY: "#F3F4F8",
+  BORDER: "#39393B",
+  HOVER_GREY: "rgba(255, 255, 255, 0.06)",
 
-  SUCCESS: "#2BB673",
-  SUCCESS_SOFT: "#E7F8F0",
+  SUCCESS: "#10B981",
+  SUCCESS_SOFT: "rgba(16, 185, 129, 0.15)",
 
   DANGER: "#EF4444",
-  DANGER_SOFT: "#FEECEC",
+  DANGER_SOFT: "rgba(239, 68, 68, 0.15)",
 
-  WARNING: "#F4C430",
-  WARNING_SOFT: "#FFF7D6",
+  WARNING: "#FFD700",
+  WARNING_SOFT: "rgba(255, 215, 0, 0.15)",
 
-  SHADOW_SM: "0 2px 6px rgba(0,0,0,0.05)",
-  SHADOW_MD: "0 6px 18px rgba(0,0,0,0.08)",
-  SHADOW_LG: "0 25px 50px rgba(0,0,0,0.15)",
+  SHADOW_SM: "none",
+  SHADOW_MD: "none",
+  SHADOW_LG: "none",
 
   RADIUS_SM: "10px",
   RADIUS_MD: "14px",

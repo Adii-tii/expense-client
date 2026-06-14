@@ -17,6 +17,7 @@ function CreateGroupModal({
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isOpenSuccessAlert, setIsOpenSuccessAlert] = useState(false);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -40,6 +41,7 @@ function CreateGroupModal({
         category: currentGroup.category || [],
         thumbnail: currentGroup.thumbnail || ""
       });
+      setThumbnailFile(null);
     }
 
     if (mode === "create") {
@@ -51,6 +53,7 @@ function CreateGroupModal({
         category: [],
         thumbnail: ""
       });
+      setThumbnailFile(null);
     }
   }, [mode, currentGroup, userDetails.email]);
 
@@ -62,6 +65,7 @@ function CreateGroupModal({
       // preview immediately
       const preview = URL.createObjectURL(file);
       setFormData(prev => ({ ...prev, thumbnail: preview }));
+      setThumbnailFile(file);
 
       // if editing existing group → upload instantly
       if (mode === "edit" && currentGroup?._id) {
@@ -115,6 +119,7 @@ function CreateGroupModal({
     setIsOpen(false);
     setErrors({});
     setTempEmail("");
+    setThumbnailFile(null);
   };
 
   /* ================= SUBMIT ================= */
@@ -130,7 +135,7 @@ function CreateGroupModal({
           description: formData.description,
           memberEmail: formData.memberEmail,
           createdBy: userDetails.id,
-          thumbnail: formData.thumbnail
+          thumbnail: "" // start with empty thumbnail
         };
 
         const res = await axios.post(
@@ -140,6 +145,20 @@ function CreateGroupModal({
         );
 
         if (res.status === 201) {
+          const createdGroup = res.data.group;
+          if (thumbnailFile && createdGroup?._id) {
+            const form = new FormData();
+            form.append("image", thumbnailFile);
+            try {
+              await axios.post(
+                `${serverEndpoint}/groups/${createdGroup._id}/thumbnail`,
+                form,
+                { withCredentials: true }
+              );
+            } catch (uploadErr) {
+              console.error("Failed to upload group thumbnail", uploadErr);
+            }
+          }
           setIsOpenSuccessAlert(true);
           refreshGroups();
           closeModal();
@@ -160,7 +179,7 @@ function CreateGroupModal({
           { withCredentials: true }
         );
 
-        if (res.status === 201) {
+        if (res.status === 201 || res.status === 200) {
           setIsOpenSuccessAlert(true);
           refreshGroups();
           closeModal();
@@ -188,8 +207,9 @@ function CreateGroupModal({
         <div
           className="modal-content border-0 rounded-4"
           style={{
-            background: "#FFFFFF",
-            boxShadow: "0 18px 40px rgba(0,0,0,0.15)"
+            background: "#1B1B1D",
+            boxShadow: "none",
+            border: "1px solid #39393B"
           }}
         >
           {/* hidden file input */}
@@ -212,7 +232,7 @@ function CreateGroupModal({
               height: 160,
               backgroundImage: formData.thumbnail
                 ? `url(${formData.thumbnail})`
-                : "linear-gradient(135deg,#7C6CF2,#7C6CF2)",
+                : "linear-gradient(135deg,#9D5CFF,#9D5CFF)",
               backgroundSize: "cover",
               backgroundPosition: "center",
               borderTopLeftRadius: 16,
@@ -290,55 +310,53 @@ function CreateGroupModal({
             )}
 
             {/* NAME */}
-            <div className="form-floating mb-3">
+            <div className={`mat-field ${formData.name ? "has-value" : ""}`}>
               <input
                 type="text"
-                className="form-control border-0 border-bottom rounded-0"
                 name="name"
                 placeholder="Group name"
                 value={formData.name}
                 onChange={handleChange}
-                style={{ borderBottom: "2px solid #E6E7EC" }}
               />
               <label>Group name</label>
             </div>
 
             {/* DESCRIPTION */}
-            <div className="form-floating mb-4">
+            <div className={`mat-field ${formData.description ? "has-value" : ""}`}>
               <textarea
-                className="form-control border-0 border-bottom rounded-0"
                 name="description"
                 placeholder="Description"
                 value={formData.description}
                 onChange={handleChange}
-                style={{
-                  height: "90px",
-                  borderBottom: "2px solid #E6E7EC"
-                }}
               />
               <label>Description</label>
             </div>
 
             {/* PARTICIPANTS */}
-            <div className="mb-2 fw-medium small" style={{ color: "#2B2D42" }}>
+            <div className="mb-2 fw-medium small" style={{ color: "#A1A1AA" }}>
               Participants
             </div>
 
-            <div className="d-flex gap-2 mb-3">
-              <input
-                type="email"
-                className="form-control rounded-pill"
-                placeholder="Add email"
-                value={tempEmail}
-                onChange={(e) => setTempEmail(e.target.value)}
-              />
-
+            <div style={{ display: "flex", alignItems: "flex-end", gap: "12px", marginBottom: "12px" }}>
+              <div className={`mat-field flex-grow-1 mb-0 ${tempEmail ? "has-value" : ""}`} style={{ marginBottom: 0 }}>
+                <input
+                  type="email"
+                  placeholder="Member email"
+                  value={tempEmail}
+                  onChange={(e) => setTempEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddMembers()}
+                />
+                <label>Member email</label>
+              </div>
               <button
-                className="btn rounded-pill px-3"
-                style={{ background: "#FFF6D6", color: "#8A6B00" }}
+                style={{
+                  background: "none", border: "none", color: "#9D5CFF",
+                  fontWeight: 600, fontSize: "13px", cursor: "pointer",
+                  paddingBottom: "8px", whiteSpace: "nowrap"
+                }}
                 onClick={handleAddMembers}
               >
-                Add
+                + Add
               </button>
             </div>
 
@@ -347,13 +365,13 @@ function CreateGroupModal({
                 <div
                   key={index}
                   className="d-flex align-items-center rounded-pill px-3 py-1"
-                  style={{ background: "#F1EFFF", color: "#7C6CF2" }}
+                  style={{ background: "rgba(157, 92, 255, 0.15)", color: "#9D5CFF" }}
                 >
                   <span className="small">{email}</span>
 
                   {mode === "create" && (
                     <button
-                      className="btn btn-sm ms-2 p-0 border-0"
+                      className="btn btn-sm ms-2 p-0 border-0 text-white-50"
                       onClick={() => handleRemoveMember(index)}
                     >
                       <i className="bi bi-x-lg small" />
@@ -368,7 +386,7 @@ function CreateGroupModal({
           <div className="px-4 pb-4 d-flex justify-content-end gap-2">
             <button
               className="btn rounded-pill px-4"
-              style={{ background: "#F3F4F8", color: "#2B2D42" }}
+              style={{ background: "#39393B", color: "#FFFFFF" }}
               onClick={closeModal}
             >
               Cancel
@@ -377,7 +395,7 @@ function CreateGroupModal({
             {isLoading ? (
               <button
                 className="btn rounded-pill px-4"
-                style={{ background: "#7C6CF2", color: "white" }}
+                style={{ background: "#FFD700", color: "#131315" }}
                 disabled
               >
                 <span className="spinner-border spinner-border-sm"></span>
@@ -385,7 +403,7 @@ function CreateGroupModal({
             ) : (
               <button
                 className="btn rounded-pill px-4"
-                style={{ background: "#7C6CF2", color: "white" }}
+                style={{ background: "#FFD700", color: "#131315" }}
                 onClick={handleSubmit}
               >
                 {mode === "create" ? "Create" : "Update"}

@@ -114,7 +114,7 @@ function ManagePayments() {
 
 
   return (
-    <div className="container py-5">
+    <div className="container-fluid px-0">
 
       {/* ALERTS */}
       {errors.message && (

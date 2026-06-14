@@ -7,15 +7,14 @@ function ExpenseCard({ expense, onClick }) {
 
   /* ===== THEME ===== */
 
-  const PRIMARY = "#7C6CF2";
-  const PRIMARY_SOFT = "#F1EFFF";
-  const TEXT_MAIN = "#111827";
-  const TEXT_MUTED = "#6B7280";
-  const BORDER = "#E5E7EB";
-  const BG_WHITE = "#FFFFFF";
+  const PRIMARY = "#9D5CFF";
+  const PRIMARY_SOFT = "rgba(157, 92, 255, 0.15)";
+  const TEXT_MAIN = "#FFFFFF";
+  const TEXT_MUTED = "#A1A1AA";
+  const BORDER = "#28282B";
+  const BG_WHITE = "#1B1B1D";
 
-  const GREEN = "#16A34A";
-  const RED = "#DC2626";
+  const GREEN = "#10B981";
 
   /* ===== CATEGORY ICON MAP ===== */
 
@@ -60,7 +59,7 @@ function ExpenseCard({ expense, onClick }) {
   } else if (myRemaining > 0) {
     type = "borrowed";
     displayAmount = myRemaining;
-    color = RED;
+    color = TEXT_MAIN;
   }
 
   /* ===== PARTICIPANTS ===== */
@@ -91,7 +90,7 @@ function ExpenseCard({ expense, onClick }) {
       {/* DATE COLUMN */}
       <div
         style={{
-          width: "70px",
+          width: "56px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -100,10 +99,10 @@ function ExpenseCard({ expense, onClick }) {
       >
         <div
           style={{
-            fontSize: "50px",
+            fontSize: "32px",
             fontWeight: 900,
-            color: PRIMARY,
-            lineHeight: "45px"
+            color: TEXT_MUTED,
+            lineHeight: "30px"
           }}
         >
           {day}
@@ -111,7 +110,7 @@ function ExpenseCard({ expense, onClick }) {
 
         <div
           style={{
-            fontSize: "16px",
+            fontSize: "11px",
             color: TEXT_MUTED,
             letterSpacing: "1.2px",
             fontWeight: 700
@@ -129,7 +128,7 @@ function ExpenseCard({ expense, onClick }) {
           display: "flex",
           background: BG_WHITE,
           borderRadius: "14px",
-          border: `1px solid ${BORDER}`,
+          border: "none",
           overflow: "hidden",
           cursor: "pointer"
         }}
@@ -138,7 +137,7 @@ function ExpenseCard({ expense, onClick }) {
         {/* ICON PANEL */}
         <div
           style={{
-            width: "90px",
+            width: "60px",
             background: PRIMARY_SOFT,
             display: "flex",
             alignItems: "center",
@@ -147,12 +146,12 @@ function ExpenseCard({ expense, onClick }) {
         >
           <i
             className={`bi ${categoryIcon}`}
-            style={{ fontSize: "50px", color: PRIMARY }}
+            style={{ fontSize: "28px", color: PRIMARY }}
           />
         </div>
 
         {/* CONTENT */}
-        <div style={{ flex: 1, padding: "12px 14px" }}>
+        <div style={{ flex: 1, padding: "8px 12px" }}>
 
           <div className="d-flex justify-content-between align-items-start">
 
@@ -169,24 +168,7 @@ function ExpenseCard({ expense, onClick }) {
                 {expense.title}
               </div>
 
-              <div
-                style={{
-                  fontSize: "11px",
-                  color: TEXT_MUTED,
-                  marginTop: "2px"
-                }}
-              >
-                {expense.category}
-              </div>
 
-              <div
-                style={{
-                  fontSize: "11px",
-                  color: TEXT_MUTED
-                }}
-              >
-                {time}
-              </div>
 
               {expense.notes && (
                 <div
@@ -206,34 +188,20 @@ function ExpenseCard({ expense, onClick }) {
             <div style={{ textAlign: "right", minWidth: "95px" }}>
 
               {type !== "settled" ? (
-                <>
-                  <div
-                    style={{
-                      fontSize: "10px",
-                      fontWeight: 700,
-                      letterSpacing: "1px",
-                      textTransform: "uppercase",
-                      color: color
-                    }}
-                  >
-                    {type}
-                  </div>
-
-                  <div
-                    style={{
-                      fontSize: "20px",
-                      fontWeight: 900,
-                      color: color
-                    }}
-                  >
-                    ₹{displayAmount.toFixed(2)}
-                  </div>
-                </>
+                <div
+                  style={{
+                    fontSize: "16px",
+                    fontWeight: 500,
+                    color: color
+                  }}
+                >
+                  ₹{displayAmount.toFixed(2)}
+                </div>
               ) : (
                 <div
                   style={{
                     fontSize: "12px",
-                    fontWeight: 600,
+                    fontWeight: 500,
                     color: TEXT_MUTED
                   }}
                 >
@@ -255,17 +223,17 @@ function ExpenseCard({ expense, onClick }) {
                   key={p.email}
                   title={p.email}
                   style={{
-                    width: "26px",
-                    height: "26px",
+                    width: "20px",
+                    height: "20px",
                     borderRadius: "50%",
                     background: PRIMARY_SOFT,
                     color: PRIMARY,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: "10px",
-                    marginLeft: i ? "-6px" : 0,
-                    border: "2px solid white"
+                    fontSize: "8px",
+                    marginLeft: i ? "-5px" : 0,
+                    border: "2.5px solid #1B1B1D"
                   }}
                 >
                   {getInitial(p.email)}
@@ -273,19 +241,7 @@ function ExpenseCard({ expense, onClick }) {
               ))}
             </div>
 
-            {/* SPLIT TYPE BADGE */}
-            <span
-              style={{
-                fontSize: "10px",
-                padding: "3px 9px",
-                borderRadius: "999px",
-                background: PRIMARY_SOFT,
-                color: PRIMARY,
-                fontWeight: 600
-              }}
-            >
-              {expense.splitType}
-            </span>
+
 
           </div>
 

@@ -132,18 +132,6 @@ function HeroSection() {
                         </div>
 
 
-                        {/* MICRO TRUST LINE */}
-                        <div
-                            style={{
-                                marginTop: "50px",
-                                fontSize: "13px",
-                                letterSpacing: "1px",
-                                color: TEXT_MUTED,
-                                textTransform: "uppercase"
-                            }}
-                        >
-                            Built for clarity • Designed for trust • Made for real life
-                        </div>
 
                     </div>
 

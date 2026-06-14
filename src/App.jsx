@@ -8,7 +8,7 @@ import Dashboard from "./pages/DashBoard";
 import axios from "axios";
 import { BeatLoader } from "react-spinners";
 import ResetPassword from "./pages/ResetPassword";
-import UserLayout from "./components/userLayout";
+import UserLayout from "./components/UserLayout";
 import { serverEndpoint } from "./config/appConfig";
 import { useSelector, useDispatch } from "react-redux"; //implement redux store to manage user state
 import { SET_USER } from "./redux/user/action.js";

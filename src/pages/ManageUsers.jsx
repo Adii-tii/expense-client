@@ -51,16 +51,16 @@ function ManageUsers() {
     }
 
     return (
-  <div className="container-fluid py-4">
+  <div className="container-fluid px-0">
 
     {/* Header */}
-    <div className="d-flex justify-content-between align-items-center mb-4 mt-4 px-2">
+    <div className="d-flex justify-content-between align-items-center mb-4 mt-0 px-0">
 
       <div>
-        <h4 className="fw-semibold" style={{ color: "#2B2D42" }}>
+        <h4 className="fw-semibold" style={{ color: "#FFFFFF" }}>
           Manage Users
         </h4>
-        <small style={{ color: "#6B7280" }}>
+        <small style={{ color: "#A1A1AA" }}>
           Manage and track shared expenses
         </small>
       </div>
@@ -69,12 +69,13 @@ function ManageUsers() {
         <button
           className="btn rounded-pill px-4"
           style={{
-            background: "#7C6CF2",
-            color: "white",
+            background: "#FFD700",
+            color: "#131315",
+            fontWeight: 600,
             transition: "0.2s"
           }}
-          onMouseEnter={(e)=> e.target.style.background="#6A5AE0"}
-          onMouseLeave={(e)=> e.target.style.background="#7C6CF2"}
+          onMouseEnter={(e)=> e.target.style.filter="brightness(1.1)"}
+          onMouseLeave={(e)=> e.target.style.filter="none"}
           onClick={() => setIsOpen(true)}
         >
           <i className="bi bi-plus me-2"></i>
@@ -105,7 +106,7 @@ function ManageUsers() {
 
         <table className="table align-middle mb-0">
 
-          <thead style={{ background: "#FAFAFC" }}>
+          <thead style={{ background: "#131315" }}>
             <tr>
               <th className="text-center">Name</th>
               <th className="text-center">Email</th>
@@ -118,7 +119,7 @@ function ManageUsers() {
 
             {users.length === 0 && (
               <tr>
-                <td colSpan={4} className="text-center py-5" style={{ color: "#6B7280" }}>
+                <td colSpan={4} className="text-center py-5" style={{ color: "#A1A1AA" }}>
                   No users found. Start by adding one!
                 </td>
               </tr>
@@ -130,7 +131,7 @@ function ManageUsers() {
                 style={{
                   transition: "0.2s"
                 }}
-                onMouseEnter={(e)=> e.currentTarget.style.background="#F3F4F8"}
+                onMouseEnter={(e)=> e.currentTarget.style.background="rgba(255, 255, 255, 0.04)"}
                 onMouseLeave={(e)=> e.currentTarget.style.background="transparent"}
               >
 
@@ -143,21 +144,21 @@ function ManageUsers() {
                       style={{
                         width: "34px",
                         height: "34px",
-                        background: "#F1EFFF",
-                        color: "#7C6CF2"
+                        background: "rgba(157, 92, 255, 0.15)",
+                        color: "#9D5CFF"
                       }}
                     >
                       {user.username?.[0]?.toUpperCase()}
                     </div>
 
-                    <span style={{ color: "#2B2D42" }}>
+                    <span style={{ color: "#FFFFFF" }}>
                       {user.username}
                     </span>
 
                   </div>
                 </td>
 
-                <td className="text-center" style={{ color: "#6B7280" }}>
+                <td className="text-center" style={{ color: "#A1A1AA" }}>
                   {user.email}
                 </td>
 
@@ -166,8 +167,8 @@ function ManageUsers() {
                   <span
                     className="px-3 py-1 rounded-pill fw-medium"
                     style={{
-                      background: "#FFF6D6",
-                      color: "#8A6B00",
+                      background: "rgba(255, 215, 0, 0.15)",
+                      color: "#FFD700",
                       fontSize: "12px"
                     }}
                   >
@@ -182,8 +183,8 @@ function ManageUsers() {
                     <button
                       className="btn rounded-pill px-3"
                       style={{
-                        background: "#F1EFFF",
-                        color: "#7C6CF2"
+                        background: "rgba(157, 92, 255, 0.15)",
+                        color: "#9D5CFF"
                       }}
                       onClick={() => handleEdit(user)}
                     >
@@ -194,7 +195,7 @@ function ManageUsers() {
                     <button
                       className="btn rounded-pill px-3"
                       style={{
-                        background: "#FCE7E7",
+                        background: "rgba(239, 68, 68, 0.15)",
                         color: "#EF4444"
                       }}
                     >
