@@ -63,7 +63,7 @@ function TransactionCard({ settlement }) {
   return (
     <div
       style={{
-        background: "#1B1B1D",
+        background: "transparent",
         border: "none",
         borderRadius: "12px",
         padding: "8px 12px",
@@ -80,8 +80,6 @@ function TransactionCard({ settlement }) {
             style={{
               width: 38,
               height: 38,
-              borderRadius: 8,
-              background: PRIMARY_SOFT,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -90,7 +88,7 @@ function TransactionCard({ settlement }) {
           >
             <i
               className={`bi ${directionIcon}`}
-              style={{ color: iconColor, fontSize: 14 }}
+              style={{ color: iconColor, fontSize: 20 }}
             />
           </div>
 

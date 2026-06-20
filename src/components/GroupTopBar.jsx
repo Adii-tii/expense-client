@@ -4,7 +4,7 @@ function GroupTopBar({ group, onEdit, onDelete, handleAddExpense, toggleMembers,
   const groupName = group?.name || "Group";
 
   return (
-    <div className="d-flex justify-content-between align-items-center mb-4 px-0" style={{ background: "transparent" }}>
+    <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center align-items-start gap-3 mb-4 px-0" style={{ background: "transparent" }}>
 
       {/* Left side: Breadcrumbs and Title */}
       <div className="d-flex flex-column align-items-start">

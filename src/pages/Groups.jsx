@@ -191,7 +191,7 @@ function Groups() {
 
       ) : groups.length === 0 ? (
 
-        <div className="card border-0 bg-light d-flex text-center py-5 w-25 mx-auto">
+        <div className="card border-0 d-flex text-center py-5 w-100 mx-auto" style={{ maxWidth: "320px", background: "#1B1B1D", border: "1px solid #28282B", color: "#FFFFFF" }}>
           <h5 className="fw-semibold mb-2">No Groups Yet</h5>
           <p className="text-muted mb-4">
             Create a group and start splitting expenses.
@@ -244,7 +244,7 @@ function Groups() {
       )}
 
       {totalPages > 1 && (
-        <div className="mt-5 d-flex justify-content-center align-items-center gap-4">
+        <div className="mt-5 d-flex flex-column flex-sm-row justify-content-center align-items-center gap-3 gap-sm-4">
 
           {/* Page Buttons */}
           <div className="d-flex gap-2">

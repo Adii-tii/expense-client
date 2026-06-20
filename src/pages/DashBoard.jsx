@@ -18,6 +18,10 @@ function Dashboard() {
   const [loadingGroups, setLoadingGroups] = useState(true);
   const [loadingCategories, setLoadingCategories] = useState(true);
 
+  const now = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1); // 1-12
+  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+
   /* ================= FETCH DATA ================= */
 
   const fetchGroups = async () => {
@@ -34,11 +38,15 @@ function Dashboard() {
     }
   };
 
-  const fetchCategories = async () => {
+  const fetchCategories = async (month, year) => {
+    setLoadingCategories(true);
     try {
       const res = await axios.get(
         `${serverEndpoint}/dashboard/grouped-by-category`,
-        { withCredentials: true }
+        {
+          withCredentials: true,
+          params: { month, year }
+        }
       );
       setCategories(res.data.categories || []);
     } catch (err) {
@@ -50,8 +58,12 @@ function Dashboard() {
 
   useEffect(() => {
     fetchGroups();
-    fetchCategories();
+    fetchCategories(selectedMonth, selectedYear);
   }, []);
+
+  useEffect(() => {
+    fetchCategories(selectedMonth, selectedYear);
+  }, [selectedMonth, selectedYear]);
 
 
 
@@ -182,7 +194,83 @@ function Dashboard() {
             className="bg-white p-4 rounded-4 border-0 h-100 d-flex flex-column"
             style={{ border: "none" }}
           >
-            <h6 className="fw-semibold mb-3">Spending by Category</h6>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h6 className="fw-semibold mb-0">Spending by Category</h6>
+
+              {/* Month Filter */}
+              <div className="d-flex align-items-center gap-1">
+                <button
+                  onClick={() => {
+                    let m = selectedMonth - 1;
+                    let y = selectedYear;
+                    if (m < 1) { m = 12; y -= 1; }
+                    setSelectedMonth(m);
+                    setSelectedYear(y);
+                  }}
+                  style={{
+                    background: "rgba(157, 92, 255, 0.08)",
+                    border: "1px solid rgba(157, 92, 255, 0.2)",
+                    color: "#9D5CFF",
+                    borderRadius: "8px",
+                    width: "26px",
+                    height: "26px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    padding: 0,
+                    fontSize: "12px",
+                    transition: "all 0.15s"
+                  }}
+                  title="Previous month"
+                >
+                  <i className="bi bi-chevron-left" />
+                </button>
+
+                <span
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: 600,
+                    color: "#A1A1AA",
+                    minWidth: "72px",
+                    textAlign: "center",
+                    letterSpacing: "0.3px"
+                  }}
+                >
+                  {new Date(selectedYear, selectedMonth - 1).toLocaleString("en-IN", { month: "short", year: "numeric" })}
+                </span>
+
+                <button
+                  onClick={() => {
+                    let m = selectedMonth + 1;
+                    let y = selectedYear;
+                    if (m > 12) { m = 1; y += 1; }
+                    setSelectedMonth(m);
+                    setSelectedYear(y);
+                  }}
+                  disabled={selectedMonth === now.getMonth() + 1 && selectedYear === now.getFullYear()}
+                  style={{
+                    background: "rgba(157, 92, 255, 0.08)",
+                    border: "1px solid rgba(157, 92, 255, 0.2)",
+                    color: selectedMonth === now.getMonth() + 1 && selectedYear === now.getFullYear() ? "#555" : "#9D5CFF",
+                    borderRadius: "8px",
+                    width: "26px",
+                    height: "26px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: selectedMonth === now.getMonth() + 1 && selectedYear === now.getFullYear() ? "default" : "pointer",
+                    padding: 0,
+                    fontSize: "12px",
+                    opacity: selectedMonth === now.getMonth() + 1 && selectedYear === now.getFullYear() ? 0.35 : 1,
+                    transition: "all 0.15s"
+                  }}
+                  title="Next month"
+                >
+                  <i className="bi bi-chevron-right" />
+                </button>
+              </div>
+            </div>
 
             <div className="flex-grow-1 d-flex align-items-center justify-content-center">
               {loadingCategories ? (

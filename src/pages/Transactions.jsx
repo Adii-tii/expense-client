@@ -96,7 +96,7 @@ function Transactions() {
             <div
               style={{
                 fontSize: "12px",
-                fontWeight: 600,
+                fontWeight: 400,
                 color: "#9CA3AF",
                 marginBottom: "12px"
               }}

@@ -23,6 +23,7 @@ function GroupDetails() {
 
     const [selectedExpense, setSelectedExpense] = useState(null);
     const [showChat, setShowChat] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     const [settleOpen, setSettleOpen] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
@@ -55,7 +56,12 @@ function GroupDetails() {
     };
 
     useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        window.addEventListener("resize", handleResize);
         return () => {
+            window.removeEventListener("resize", handleResize);
             if (timelineScrollTimeoutRef.current) {
                 clearTimeout(timelineScrollTimeoutRef.current);
             }
@@ -199,7 +205,7 @@ function GroupDetails() {
 
                 {/* Left Timeline Area */}
                 <div
-                    className={`flex-grow-1 timeline-scrollbar ${isTimelineScrolling ? "scrolling" : ""}`}
+                    className={`flex-grow-1 timeline-scrollbar ${isTimelineScrolling ? "scrolling" : ""} ${isMobile && showChat ? "d-none" : ""}`}
                     onScroll={handleTimelineScroll}
                     style={{
                         minWidth: 0,
@@ -274,7 +280,7 @@ function GroupDetails() {
                                                 fontSize: "12px",
                                                 color: "#A1A1AA",
                                                 margin: "24px 0 12px",
-                                                fontWeight: 600
+                                                fontWeight: 400
                                             }}
                                         >
                                             {date}
@@ -304,7 +310,7 @@ function GroupDetails() {
                 {/* Right Chat Side Panel */}
                 <div
                     style={{
-                        width: showChat ? "420px" : "0px",
+                        width: showChat ? (isMobile ? "100%" : "420px") : "0px",
                         opacity: showChat ? 1 : 0,
                         pointerEvents: showChat ? "auto" : "none",
                         transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -321,8 +327,9 @@ function GroupDetails() {
                 onClick={handleAddExpense}
                 style={{
                     position: "fixed",
-                    bottom: "28px",
-                    right: showChat ? "468px" : "28px",
+                    bottom: isMobile ? "16px" : "28px",
+                    right: isMobile ? "16px" : (showChat ? "468px" : "28px"),
+                    display: isMobile && showChat ? "none" : "block",
                     width: "64px",
                     height: "64px",
                     borderRadius: "50%",

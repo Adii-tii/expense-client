@@ -6,14 +6,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { CLEAR_USER } from "../redux/user/action.js";
 
 
-function UserHeader({ sidebarCollapsed }) {
+function UserHeader({ sidebarCollapsed, isMobile, mobileOpen, setMobileOpen }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userDetails);
   const navigate = useNavigate();
 
   const [scrolled, setScrolled] = useState(false);
 
-  const sidebarWidth = sidebarCollapsed ? 70 : 220;
+  const sidebarWidth = isMobile ? 0 : (sidebarCollapsed ? 70 : 220);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,32 +61,51 @@ function UserHeader({ sidebarCollapsed }) {
     >
       <div className="container-fluid d-flex justify-content-between align-items-center px-0">
 
-        {/* Search Input */}
-        <div className="position-relative" style={{ width: "320px" }}>
-          <i
-            className="bi bi-search position-absolute"
-            style={{
-              left: "16px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "#A1A1AA",
-              fontSize: "14px"
-            }}
-          />
-          <input
-            type="text"
-            className="form-control text-white"
-            placeholder="Search transactions..."
-            style={{
-              paddingLeft: "42px",
-              paddingRight: "16px",
-              height: "40px",
-              borderRadius: "20px",
-              border: "1px solid #39393B",
-              background: "#1B1B1D",
-              fontSize: "14px"
-            }}
-          />
+        <div className="d-flex align-items-center flex-grow-1">
+          {isMobile && (
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="btn border-0 p-0 me-2 d-flex align-items-center justify-content-center"
+              style={{
+                width: "38px",
+                height: "38px",
+                borderRadius: "10px",
+                background: "rgba(255, 255, 255, 0.05)",
+                color: "#FFFFFF",
+                fontSize: "20px"
+              }}
+            >
+              <i className="bi bi-list" />
+            </button>
+          )}
+
+          {/* Search Input */}
+          <div className="position-relative flex-grow-1" style={{ maxWidth: isMobile ? "180px" : "320px" }}>
+            <i
+              className="bi bi-search position-absolute"
+              style={{
+                left: "16px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#A1A1AA",
+                fontSize: "14px"
+              }}
+            />
+            <input
+              type="text"
+              className="form-control text-white"
+              placeholder="Search transactions..."
+              style={{
+                paddingLeft: "42px",
+                paddingRight: "16px",
+                height: "40px",
+                borderRadius: "20px",
+                border: "1px solid #39393B",
+                background: "#1B1B1D",
+                fontSize: "14px"
+              }}
+            />
+          </div>
         </div>
 
         {/* User Actions */}

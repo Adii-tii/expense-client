@@ -10,6 +10,8 @@ function SummaryCards({ onSettle }) {
     totalSpendings: 0
   });
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
   const fetchSummary = async () => {
     try {
       const res = await axios.get(
@@ -24,6 +26,12 @@ function SummaryCards({ onSettle }) {
 
   useEffect(() => {
     fetchSummary();
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const fmt = (v) =>
@@ -38,25 +46,29 @@ function SummaryCards({ onSettle }) {
           className="h-100 rounded-4 overflow-hidden position-relative"
           style={{
             background: "linear-gradient(145deg, #FFD02F 0%, #FFC107 100%)",
-            padding: "24px",
-            minHeight: "140px",
+            padding: isMobile ? "16px" : "24px",
+            minHeight: isMobile ? "100px" : "140px",
           }}
         >
           {/* Decorative circles */}
-          <div style={{
-            position: "absolute", top: "-30px", right: "-30px",
-            width: "120px", height: "120px", borderRadius: "50%",
-            background: "rgba(0,0,0,0.04)"
-          }} />
-          <div style={{
-            position: "absolute", bottom: "-20px", right: "40px",
-            width: "80px", height: "80px", borderRadius: "50%",
-            background: "rgba(0,0,0,0.03)"
-          }} />
+          {!isMobile && (
+            <>
+              <div style={{
+                position: "absolute", top: "-30px", right: "-30px",
+                width: "120px", height: "120px", borderRadius: "50%",
+                background: "rgba(0,0,0,0.04)"
+              }} />
+              <div style={{
+                position: "absolute", bottom: "-20px", right: "40px",
+                width: "80px", height: "80px", borderRadius: "50%",
+                background: "rgba(0,0,0,0.03)"
+              }} />
+            </>
+          )}
 
           <div style={{ position: "relative", zIndex: 1 }}>
             {/* Icon badge + label */}
-            <div className="d-flex align-items-center gap-2 mb-3">
+            <div className={`d-flex align-items-center gap-2 ${isMobile ? "mb-2" : "mb-3"}`}>
               <div style={{
                 width: "32px", height: "32px", borderRadius: "10px",
                 background: "rgba(0,0,0,0.10)",
@@ -74,7 +86,7 @@ function SummaryCards({ onSettle }) {
 
             {/* Amount */}
             <div style={{
-              fontSize: "34px", fontWeight: 900, color: "#3A2900",
+              fontSize: isMobile ? "26px" : "34px", fontWeight: 900, color: "#3A2900",
               letterSpacing: "-1px", lineHeight: 1
             }}>
               {fmt(summary.totalOwe)}
@@ -84,7 +96,7 @@ function SummaryCards({ onSettle }) {
             <button
               onClick={onSettle}
               style={{
-                marginTop: "16px",
+                marginTop: isMobile ? "12px" : "16px",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "6px",
@@ -114,25 +126,29 @@ function SummaryCards({ onSettle }) {
           className="h-100 rounded-4 overflow-hidden position-relative"
           style={{
             background: "linear-gradient(145deg, #9D5CFF 0%, #8E54FF 100%)",
-            padding: "24px",
-            minHeight: "140px",
+            padding: isMobile ? "16px" : "24px",
+            minHeight: isMobile ? "100px" : "140px",
           }}
         >
           {/* Decorative circles */}
-          <div style={{
-            position: "absolute", top: "-30px", right: "-30px",
-            width: "120px", height: "120px", borderRadius: "50%",
-            background: "rgba(255,255,255,0.06)"
-          }} />
-          <div style={{
-            position: "absolute", bottom: "-20px", right: "40px",
-            width: "80px", height: "80px", borderRadius: "50%",
-            background: "rgba(255,255,255,0.04)"
-          }} />
+          {!isMobile && (
+            <>
+              <div style={{
+                position: "absolute", top: "-30px", right: "-30px",
+                width: "120px", height: "120px", borderRadius: "50%",
+                background: "rgba(255,255,255,0.06)"
+              }} />
+              <div style={{
+                position: "absolute", bottom: "-20px", right: "40px",
+                width: "80px", height: "80px", borderRadius: "50%",
+                background: "rgba(255,255,255,0.04)"
+              }} />
+            </>
+          )}
 
           <div style={{ position: "relative", zIndex: 1 }}>
             {/* Icon badge + label */}
-            <div className="d-flex align-items-center gap-2 mb-3">
+            <div className={`d-flex align-items-center gap-2 ${isMobile ? "mb-2" : "mb-3"}`}>
               <div style={{
                 width: "32px", height: "32px", borderRadius: "10px",
                 background: "rgba(255,255,255,0.12)",
@@ -150,7 +166,7 @@ function SummaryCards({ onSettle }) {
 
             {/* Amount */}
             <div style={{
-              fontSize: "34px", fontWeight: 900, color: "#FFFFFF",
+              fontSize: isMobile ? "26px" : "34px", fontWeight: 900, color: "#FFFFFF",
               letterSpacing: "-1px", lineHeight: 1
             }}>
               {fmt(Math.max(summary.totalOwed, 0))}
@@ -158,7 +174,7 @@ function SummaryCards({ onSettle }) {
 
             {/* Subtext */}
             <div style={{
-              marginTop: "16px", fontSize: "12px", fontWeight: 600,
+              marginTop: isMobile ? "12px" : "16px", fontSize: "12px", fontWeight: 600,
               color: "rgba(255,255,255,0.50)"
             }}>
               Outstanding dues to collect
@@ -174,25 +190,29 @@ function SummaryCards({ onSettle }) {
           style={{
             background: "#1B1B1D",
             border: "1px solid #28282B",
-            padding: "24px",
-            minHeight: "140px",
+            padding: isMobile ? "16px" : "24px",
+            minHeight: isMobile ? "100px" : "140px",
           }}
         >
           {/* Decorative circles */}
-          <div style={{
-            position: "absolute", top: "-30px", right: "-30px",
-            width: "120px", height: "120px", borderRadius: "50%",
-            background: "rgba(157, 92, 255, 0.04)"
-          }} />
-          <div style={{
-            position: "absolute", bottom: "-20px", right: "40px",
-            width: "80px", height: "80px", borderRadius: "50%",
-            background: "rgba(157, 92, 255, 0.03)"
-          }} />
+          {!isMobile && (
+            <>
+              <div style={{
+                position: "absolute", top: "-30px", right: "-30px",
+                width: "120px", height: "120px", borderRadius: "50%",
+                background: "rgba(157, 92, 255, 0.04)"
+              }} />
+              <div style={{
+                position: "absolute", bottom: "-20px", right: "40px",
+                width: "80px", height: "80px", borderRadius: "50%",
+                background: "rgba(157, 92, 255, 0.03)"
+              }} />
+            </>
+          )}
 
           <div style={{ position: "relative", zIndex: 1 }}>
             {/* Icon badge + label */}
-            <div className="d-flex align-items-center gap-2 mb-3">
+            <div className={`d-flex align-items-center gap-2 ${isMobile ? "mb-2" : "mb-3"}`}>
               <div style={{
                 width: "32px", height: "32px", borderRadius: "10px",
                 background: "rgba(157, 92, 255, 0.12)",
@@ -210,7 +230,7 @@ function SummaryCards({ onSettle }) {
 
             {/* Amount */}
             <div style={{
-              fontSize: "34px", fontWeight: 900, color: "#FFFFFF",
+              fontSize: isMobile ? "26px" : "34px", fontWeight: 900, color: "#FFFFFF",
               letterSpacing: "-1px", lineHeight: 1
             }}>
               {fmt(summary.totalSpendings)}
@@ -218,7 +238,7 @@ function SummaryCards({ onSettle }) {
 
             {/* Subtext */}
             <div style={{
-              marginTop: "16px", fontSize: "12px", fontWeight: 600,
+              marginTop: isMobile ? "12px" : "16px", fontSize: "12px", fontWeight: 600,
               color: "#4A4A52"
             }}>
               Aggregated across all groups

@@ -1,12 +1,13 @@
 import { useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 
-function Sidebar({ collapsed, setCollapsed }) {
+function Sidebar({ collapsed, setCollapsed, isMobile, mobileOpen, setMobileOpen }) {
   const navigate = useNavigate();
   const location = useLocation();
   const user = useSelector((state) => state.userDetails);
 
-  const width = collapsed ? "70px" : "220px";
+  const width = isMobile ? "220px" : (collapsed ? "70px" : "220px");
+  const left = isMobile ? (mobileOpen ? "0px" : "-220px") : "0px";
 
   const menuItems = [
     ["dashboard", "bi-grid", "Dashboard"],
@@ -23,7 +24,7 @@ function Sidebar({ collapsed, setCollapsed }) {
       className="position-fixed d-flex flex-column"
       style={{
         top: "0",
-        left: "0",
+        left,
         bottom: "0",
         width,
         height: "100vh",
@@ -38,14 +39,14 @@ function Sidebar({ collapsed, setCollapsed }) {
 
       {/* ===== HEADER ===== */}
       <div className="px-3 py-2 d-flex align-items-center justify-content-between" style={{ height: "55px", borderBottom: "1px solid #1E1E20" }}>
-        {!collapsed && (
+        {(!collapsed || isMobile) && (
           <span className="fw-bold" style={{ color: "#FFFFFF", fontSize: "16px", letterSpacing: "-0.3px" }}>
             Expense
           </span>
         )}
 
         <div
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={() => isMobile ? setMobileOpen(false) : setCollapsed(!collapsed)}
           className="d-flex align-items-center justify-content-center"
           style={{
             width: "32px", height: "32px",
@@ -63,7 +64,7 @@ function Sidebar({ collapsed, setCollapsed }) {
             e.currentTarget.style.background = "transparent";
           }}
         >
-          <i className={`bi ${collapsed ? "bi-list" : "bi-layout-sidebar"}`} style={{ fontSize: "16px" }} />
+          <i className={`bi ${isMobile ? "bi-x" : (collapsed ? "bi-list" : "bi-layout-sidebar")}`} style={{ fontSize: isMobile ? "22px" : "16px" }} />
         </div>
       </div>
 
@@ -85,7 +86,10 @@ function Sidebar({ collapsed, setCollapsed }) {
                   gap: "12px",
                   justifyContent: collapsed ? "center" : "flex-start"
                 }}
-                onClick={() => navigate(`/${key}`)}
+                onClick={() => {
+                  navigate(`/${key}`);
+                  if (isMobile) setMobileOpen(false);
+                }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
                     e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
@@ -143,7 +147,10 @@ function Sidebar({ collapsed, setCollapsed }) {
               gap: "12px",
               justifyContent: collapsed ? "center" : "flex-start"
             }}
-            onClick={() => navigate("/settings")}
+            onClick={() => {
+              navigate("/settings");
+              if (isMobile) setMobileOpen(false);
+            }}
             onMouseEnter={(e) => {
               if (active !== "settings") {
                 e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
